@@ -120,7 +120,7 @@ class GitServerImpl implements GitServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        FileServer fileServer = new FileServer(getHttpPort());
+        FileServer fileServer = new FileServer(getHttpPort(), this.setting.getFileLoader());
         try {
             fileServer.start();
         } catch (IOException e) {

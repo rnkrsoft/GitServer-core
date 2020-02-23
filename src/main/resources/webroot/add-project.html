@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>首页</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="lib/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
+		<link rel="stylesheet" type="text/css" href="lib/doublebox/doublebox-bootstrap.css"/>
+		<style type="text/css">
+			body{
+				font-family: '微软雅黑'
+			}
+			.add-pro-title{
+				font-weight: bold;
+				color: #40485B;
+			}
+			.add-pro-label{
+				color: #40485B;
+				display: block;
+				margin: 0em 0em 0.2857rem 0em;
+				font-size: 1em;
+				font-weight: bold;
+				text-transform: none;
+			}
+			.ue-container {
+			   width:80%;
+			   margin-left: 0;
+			   padding: 9px 5px;
+			   background: #fff;
+		   }
+		   .ue-container label{font-weight: bold;
+				color: #40485B;color: #40485B;
+		   }
+		</style>
+	</head>
+	<body>
+		<nav class="navbar navbar-inverse" role="navigation">
+			<div class="container-fluid"> 
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse"
+							data-target="#example-navbar-collapse">
+						<span class="sr-only">切换导航</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="#">GitServer</a>
+				</div>
+				<div class="collapse navbar-collapse" id="example-navbar-collapse">
+					<ul class="nav navbar-nav">
+						<li class="active"><a href="#">首页</a></li>
+						<li><a href="#">使用手册</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+					  <!-- <li><a href="#"><span class="glyphicon glyphicon-user"></span> 注册</a></li> -->
+					  <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> 退出</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<div class="container">
+			<div class="row">
+				<h3 class="add-pro-title">新建项目</h3>
+			</div>
+			<div class="row">
+				<form>
+					<div class="form-group">
+						<label class="add-pro-label">项目名</label>
+						<input type="pro-name" class="form-control" placeholder="请输入项目名称">
+					</div>
+					<div class="form-group">
+						<label class="add-pro-label">项目描述</label>
+						<input type="pao-memo" class="form-control" placeholder="请输入项目描述">
+					</div>
+					<div class="form-group">
+						<label class="add-pro-label">用户权限</label>
+						<div class="ue-container">
+							<select multiple="multiple" size="10" name="doublebox" id="selectBox" class="form-control">
+							</select>
+						</div>
+							
+					</div>
+					<button type="submit" class="btn btn-warning">确定</button>
+				</form>
+			</div>
+		</div>
+		<script src="lib/jquery-1.12.4.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/bootstrap-3.3.7-dist/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/doublebox/doublebox-bootstrap.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				var demo2 = $('#selectBox').doublebox({
+					nonSelectedListLabel: '所有用户',
+					selectedListLabel: '拥有',
+					preserveSelectionOnMove: 'moved',
+					moveOnSelect: false,
+					nonSelectedList:[{"roleId":"1","roleName":"zhangsan"},{"roleId":"2","roleName":"lisi"},{"roleId":"3","roleName":"wangwu"}],
+					selectedList:[{"roleId":"4","roleName":"zhangsan1"},{"roleId":"5","roleName":"lisi1"},{"roleId":"6","roleName":"wangwu1"}],
+					optionValue:"roleId",
+					optionText:"roleName",
+					doubleMove:true,
+				});
+			})
+			
+			// 获取未选中的所有的值
+			var selectedText = new Array();
+			var selectedOption = new Array();
+			$('select[name="doublebox"]').find("option:not(:selected)").each(function(index, item) {
+				selectedText[index] = $(item).text();
+				selectedOption[index] = $(item).val();
+			});
+			$('select[name="doublebox"]').find("option:selected").each(function(index, item) {
+				selectedText[index] = $(item).text();
+				selectedOption[index] = $(item).val();
+			});
+		</script>
+	</body>
+</html>

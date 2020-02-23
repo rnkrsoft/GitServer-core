@@ -1,9 +1,12 @@
 package com.rnkrsoft.gitserver;
 
+import com.rnkrsoft.gitserver.http.loader.FileLoader;
+
 public final class GitServerSetting {
     private String repositoriesHome;
     private int sshPort;
     private int httpPort;
+    private FileLoader fileLoader;
 
     public String getRepositoriesHome() {
         return repositoriesHome;
@@ -16,6 +19,11 @@ public final class GitServerSetting {
     public int getHttpPort() {
         return httpPort;
     }
+
+    public FileLoader getFileLoader() {
+        return fileLoader;
+    }
+
     public static GitServerSettingBuilder builder(){
         return new GitServerSettingBuilder();
     }
@@ -23,7 +31,7 @@ public final class GitServerSetting {
         private String repositoriesHome;
         private int sshPort;
         private int httpPort;
-
+        private FileLoader fileLoader;
         private GitServerSettingBuilder() {
         }
 
@@ -42,11 +50,17 @@ public final class GitServerSetting {
             return this;
         }
 
+        public GitServerSettingBuilder fileLoader(FileLoader fileLoader) {
+            this.fileLoader = fileLoader;
+            return this;
+        }
+
         public GitServerSetting build(){
             GitServerSetting setting = new GitServerSetting();
             setting.repositoriesHome = repositoriesHome;
             setting.sshPort = sshPort;
             setting.httpPort = httpPort;
+            setting.fileLoader = fileLoader;
             return setting;
         }
     }

@@ -2,6 +2,7 @@ package com.rnkrsoft.gitserver;
 
 import com.rnkrsoft.gitserver.exception.RepositoryCreateFailureException;
 import com.rnkrsoft.gitserver.exception.UninitializedGitServerException;
+import com.rnkrsoft.gitserver.http.loader.DefaultFileLoader;
 import com.rnkrsoft.gitserver.utils.PasswordUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
@@ -13,7 +14,7 @@ public class GitServerImplTest {
     @Test
     public void start() throws IOException, InterruptedException, UninitializedGitServerException {
         GitServer gitServer = GitServerFactory.getInstance();
-        gitServer.init(GitServerSetting.builder().repositoriesHome("./target").sshPort(8022).httpPort(8080).build()).startup();
+        gitServer.init(GitServerSetting.builder().repositoriesHome("./target").sshPort(8022).httpPort(8080).fileLoader(new DefaultFileLoader()).build()).startup();
         gitServer.registerUser("test", "test", PasswordUtils.generateSha1("123456"));
         gitServer.grantPermission("demo", "test", "push");
         Thread.sleep(600 * 1000);

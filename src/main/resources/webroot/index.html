@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>首页</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="lib/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
+		<link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.css">
+		<style type="text/css">
+			body{
+				font-family: '微软雅黑'
+			}
+			.pro-title{
+				font-weight: bold;
+				color: #40485B;
+			}
+			.pro-by-user{
+				color: #40485B;
+				line-height: 45px;
+			}
+			.pro-content-list{
+				margin-top: 10px;
+			}
+			.border-bottom{
+				border-bottom: 1px;
+				border-color: #40485B;
+				border-bottom-style: dashed;
+				margin-bottom: 10px;
+			}
+			.diy-page-style{
+				margin-top: 0;
+				padding-top:0;
+			}
+			.diy-page-style > .pagination{
+				margin-top: 0;
+			}
+		</style>
+	</head>
+	<body>
+		<nav class="navbar navbar-inverse" role="navigation">
+			<div class="container-fluid"> 
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse"
+							data-target="#example-navbar-collapse">
+						<span class="sr-only">切换导航</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="#">GitServer</a>
+				</div>
+				<div class="collapse navbar-collapse" id="example-navbar-collapse">
+					<ul class="nav navbar-nav">
+						<li class="active"><a href="#">首页</a></li>
+						<li><a href="#">使用手册</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+					  <!-- <li><a href="#"><span class="glyphicon glyphicon-user"></span> 注册</a></li> -->
+					  <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> 退出</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-8"><h4 class="pro-title"><span class="glyphicon glyphicon-star-empty"></span> 项目的目录 / 项目的名称</h4></div>
+				<div class="col-md-4 text-right pro-by-user  visible-md-block visible-lg-block"><span class="glyphicon glyphicon-user"></span> 项目来源者</div>
+				<div class="col-md-4 text-left pro-by-user visible-xs-block visible-sm-block"><span class="glyphicon glyphicon-user"></span> 项目来源者</div>
+				<div class="col-md-12">
+					<div class="border-bottom"></div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-12 text-right">
+					<a href="add-project.html">
+					<button type="button" class="btn btn-warning btn-sm">
+					  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 添加项目
+					</button>
+					</a>
+				</div>
+				<div class="col-md-12 pro-content-list">
+					<div id="toolbar"></div><!--工具栏-->
+					<table id="table"></table><!--表格-->
+				</div>
+			</div>
+		</div>
+		<script src="lib/jquery-1.12.4.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/bootstrap-3.3.7-dist/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.js"></script>
+		<script src="https://unpkg.com/bootstrap-table@1.15.3/dist/locale/bootstrap-table-zh-CN.min.js"></script>
+		<script type="text/javascript">
+			// 模拟数据
+			var tableData = [
+                {id:1001,catalog:"/AA/BB/CC/DD01.txt",version:"1.0",committer:"lilin",memo:"demo..."},
+				{id:1002,catalog:"/AA/BB/CC/DD02.txt",version:"1.0",committer:"lilin",memo:"demo..."},
+				{id:1003,catalog:"/AA/BB/CC/DD03.txt",version:"1.0",committer:"lilin",memo:"demo..."},
+				{id:1004,catalog:"/AA/BB/CC/DD04.txt",version:"1.0",committer:"lilin",memo:"demo..."},
+				{id:1005,catalog:"/AA/BB/CC/DD05.txt",version:"1.0",committer:"lilin",memo:"demo..."},
+				{id:1006,catalog:"/AA/BB/CC/DD06.txt",version:"1.0",committer:"lilin",memo:"demo..."},
+				{id:1007,catalog:"/AA/BB/CC/DD07.txt",version:"1.0",committer:"lilin",memo:"demo..."},
+				{id:1008,catalog:"/AA/BB/CC/DD08.txt",version:"1.0",committer:"lilin",memo:"demo..."},
+				{id:1009,catalog:"/AA/BB/CC/DD09.txt",version:"1.0",committer:"lilin",memo:"demo..."}
+            ];
+			$('#table').bootstrapTable({
+				toolbar: '#toolbar',                //工具按钮用哪个容器
+				// url: "/queryAll",//请求路径
+				method: 'POST',
+				striped: true, //是否显示行间隔色
+				pageNumber: 1, //初始化加载第一页
+				pagination: true,//是否分页
+				sidePagination: 'client',//server:服务器端分页|client：前端分页
+				pageSize: 5,//单页记录数
+				pageList: [5, 10, 20, 30],//可选择单页记录数
+				data: tableData, 
+				columns: [
+					{
+						field:'catalog',
+						title:'目录',
+					},{
+						field:'version',
+						title:'版本',
+					},{
+						field:'committer',
+						title:'提交者',
+					},{
+						field:'memo',
+						title:'描述',
+					},{
+						field:'operate',
+						title:'操作',
+						align:"center",
+						formatter: operation, //对资源进行操作
+					}
+				],                 
+			});
+			
+			function operation(value, row, index) {
+				var htm = '<a class="btn btn-danger btn-xs" href="" >删除</a>&nbsp;&nbsp;<a class="btn btn-info btn-xs" href="" >详情</a>';
+				return htm;
+			}
+		</script>
+	</body>
+</html>
