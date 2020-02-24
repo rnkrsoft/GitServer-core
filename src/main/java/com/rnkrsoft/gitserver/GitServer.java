@@ -9,6 +9,7 @@ import com.rnkrsoft.gitserver.service.UserService;
 
 /**
  * Git服务
+ * Created by woate on 2020/02/24.
  */
 public interface GitServer extends UserService, PermissionService, RoleService, RepositoryService {
     /**

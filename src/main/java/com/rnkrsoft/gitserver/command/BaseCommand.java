@@ -7,7 +7,9 @@ import org.apache.sshd.server.Command;
 import org.apache.sshd.server.ExitCallback;
 import org.apache.sshd.server.SessionAware;
 import org.apache.sshd.server.session.ServerSession;
-
+/**
+ * Created by woate on 2020/02/24.
+ */
 public abstract class BaseCommand implements Command, SessionAware {
 
 	

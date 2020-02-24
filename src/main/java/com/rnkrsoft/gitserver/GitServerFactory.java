@@ -1,5 +1,8 @@
 package com.rnkrsoft.gitserver;
 
+/**
+ * Created by woate on 2020/02/24.
+ */
 public final class GitServerFactory {
     private static GitServer SERVER;
 

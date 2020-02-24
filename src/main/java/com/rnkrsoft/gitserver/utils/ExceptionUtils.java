@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
 
+/**
+ * Created by woate on 2020/02/24.
+ */
 public class ExceptionUtils {
 
     static class UnsafeStringWriter extends Writer {

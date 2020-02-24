@@ -9,7 +9,9 @@ import com.rnkrsoft.gitserver.command.CommandConstants;
 import org.eclipse.jgit.lib.Config;
 import org.eclipse.jgit.storage.pack.PackConfig;
 import org.eclipse.jgit.transport.UploadPack;
-
+/**
+ * Created by woate on 2020/02/24.
+ */
 public final class PullCommand extends AbstractGitCommand {
 	private final static String MSG_REPOSITORY_PERMISSIONS = "message: Don't have permissions to PULL from this repository.please make sure registered!\r\n";
 	

@@ -3,6 +3,9 @@ package com.rnkrsoft.gitserver.utils;
 import org.bouncycastle.crypto.digests.SHA1Digest;
 import org.bouncycastle.util.encoders.Hex;
 
+/**
+ * Created by woate on 2020/02/24.
+ */
 public class PasswordUtils {
     public static String generateSha1(String password) {
         byte[] dataBytes = password.getBytes();

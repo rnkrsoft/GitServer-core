@@ -11,7 +11,9 @@ import com.rnkrsoft.gitserver.log.LoggerFactory;
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.CommandFactory;
 
-
+/**
+ * Created by woate on 2020/02/24.
+ */
 public class GitCommandFactory implements CommandFactory {
 	Logger logger = LoggerFactory.getInstance();
 	private final static Pattern pathPattern = Pattern.compile("^[\\w-\\.]+$");

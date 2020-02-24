@@ -6,6 +6,10 @@ import com.rnkrsoft.gitserver.GitServerSetting;
 import com.rnkrsoft.gitserver.exception.UninitializedGitServerException;
 import com.rnkrsoft.gitserver.http.loader.DefaultFileLoader;
 
+/**
+ * Created by woate on 2020/02/24.
+ * GitServer启动器
+ */
 public class GitServerStarter {
     public static void main(String[] args) throws UninitializedGitServerException, InterruptedException {
         GitServer gitServer = GitServerFactory.getInstance();

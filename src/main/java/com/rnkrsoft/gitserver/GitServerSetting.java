@@ -2,6 +2,9 @@ package com.rnkrsoft.gitserver;
 
 import com.rnkrsoft.gitserver.http.loader.FileLoader;
 
+/**
+ * Created by woate on 2020/02/24.
+ */
 public final class GitServerSetting {
     private String repositoriesHome;
     private int sshPort;

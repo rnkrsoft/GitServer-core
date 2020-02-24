@@ -10,6 +10,7 @@ import org.eclipse.jgit.lib.Config;
 import org.eclipse.jgit.transport.ReceivePack;
 
 /**
+ * Created by woate on 2020/02/24.
  * Receives change upload over SSH using the Git receive-pack protocol.
  */
 public final class PushCommand extends AbstractGitCommand {

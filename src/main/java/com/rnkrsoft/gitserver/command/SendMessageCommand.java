@@ -4,6 +4,10 @@ import java.io.IOException;
 
 import org.apache.sshd.server.Environment;
 import org.eclipse.jgit.lib.Constants;
+
+/**
+ * Created by woate on 2020/02/24.
+ */
 public class SendMessageCommand extends BaseCommand {
 	
 	private String message;

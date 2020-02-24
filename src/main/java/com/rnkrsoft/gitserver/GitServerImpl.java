@@ -35,6 +35,9 @@ import java.security.PublicKey;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Created by woate on 2020/02/24.
+ */
 class GitServerImpl implements GitServer {
     static final int STOP = 0;
     static final int INIT = 1;

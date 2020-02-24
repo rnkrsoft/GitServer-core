@@ -12,7 +12,9 @@ import org.apache.sshd.server.Environment;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
-
+/**
+ * Created by woate on 2020/02/24.
+ */
 public abstract class AbstractGitCommand extends BaseCommand {
     Logger logger = LoggerFactory.getInstance();
     private final static String MSG_REPOSITORY_NOT_FOUND = "Repository is not found.\r\n";
