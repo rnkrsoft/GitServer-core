@@ -7,7 +7,7 @@ import com.rnkrsoft.gitserver.entity.RoleEntity;
 import com.rnkrsoft.gitserver.entity.UserEntity;
 import com.rnkrsoft.gitserver.exception.RepositoryCreateFailureException;
 import com.rnkrsoft.gitserver.exception.UninitializedGitServerException;
-import com.rnkrsoft.gitserver.http.mgr.FileServer;
+import com.rnkrsoft.gitserver.http.HttpServer;
 import com.rnkrsoft.gitserver.log.Logger;
 import com.rnkrsoft.gitserver.log.LoggerFactory;
 import com.rnkrsoft.gitserver.service.impl.FilePermissionService;
@@ -120,9 +120,9 @@ class GitServerImpl implements GitServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        FileServer fileServer = new FileServer(getHttpPort(), this.setting.getFileLoader());
+        HttpServer httpServer = new HttpServer(getHttpPort(), this.setting.getFileLoader());
         try {
-            fileServer.start();
+            httpServer.start();
         } catch (IOException e) {
             e.printStackTrace();
         }

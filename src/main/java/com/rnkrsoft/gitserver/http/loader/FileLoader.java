@@ -5,8 +5,13 @@ import java.io.InputStream;
 
 /**
  * 文件加载器，用于将文件路径指定的文件加载读取成输入流
+ * 此类的作用通过接口方式进行反转文件的访问，以对同一套代码用于Java平台和安卓平台
+ * Created by rnkrsoft on 2020/02/24.
  */
 public interface FileLoader {
+    /**
+     * 存放的web资源根目录
+     */
     String WEB_ROOT = "webroot";
 
     /**
