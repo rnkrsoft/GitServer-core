@@ -33,13 +33,21 @@ import java.io.File;
 import java.io.IOException;
 import java.security.PublicKey;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 class GitServerImpl implements GitServer {
-    boolean init = false;
+    static final int STOP = 0;
+    static final int INIT = 1;
+    static final int RUNNING = 2;
+
+    final AtomicInteger state = new AtomicInteger(0);
     GitServerSetting setting;
     Logger logger = LoggerFactory.getInstance();
+    SshServer sshServer;
+    HttpServer httpServer;
     UserService userService;
     PermissionService permissionService;
+
     GitServerImpl() {
         this.userService = new FileUserService(this);
         this.permissionService = new FilePermissionService(this);
@@ -68,7 +76,7 @@ class GitServerImpl implements GitServer {
             }
         }
         this.setting = setting;
-        this.init = true;
+        this.state.compareAndSet(STOP, INIT);
         return this;
     }
 
@@ -83,50 +91,70 @@ class GitServerImpl implements GitServer {
             }
 
         }
-        if (!this.init) {
+        if (this.state.get() != INIT) {
             throw new UninitializedGitServerException("Git Server is uninitialized！");
         }
-        SshServer sshServer = SshServer.setUpDefaultServer();
-        sshServer.setPort(this.setting.getSshPort());
-        SimpleGeneratorHostKeyProvider hostKeyProvider = new SimpleGeneratorHostKeyProvider("hostkey.ser", "RSA", 2048);
-        sshServer.setKeyPairProvider(hostKeyProvider);
-        sshServer.setShellFactory(new NoShell());
-        sshServer.setCommandFactory(new GitCommandFactory(this));
-        sshServer.setPasswordAuthenticator(new PasswordAuthenticator() {
+        synchronized (this) {
+            sshServer = SshServer.setUpDefaultServer();
+            sshServer.setPort(this.setting.getSshPort());
+            SimpleGeneratorHostKeyProvider hostKeyProvider = new SimpleGeneratorHostKeyProvider("hostkey.ser", "RSA", 2048);
+            sshServer.setKeyPairProvider(hostKeyProvider);
+            sshServer.setShellFactory(new NoShell());
+            sshServer.setCommandFactory(new GitCommandFactory(this));
+            sshServer.setPasswordAuthenticator(new PasswordAuthenticator() {
 
-            @Override
-            public boolean authenticate(String username, String password, ServerSession session) {
-                if (password == null || "".equals(password.trim())) {
-                    return false;
+                @Override
+                public boolean authenticate(String username, String password, ServerSession session) {
+                    if (password == null || "".equals(password.trim())) {
+                        return false;
+                    }
+                    if (hasUser(username)) {//如果已经注册的用户，则验证是否能通过鉴权
+                        return hasAuthority(username, PasswordUtils.generateSha1(password));
+                    } else {//如果不存在的用户，则自动注册
+                        registerUser(username, username, PasswordUtils.generateSha1(password));
+                        return true;
+                    }
                 }
-                if (hasUser(username)){//如果已经注册的用户，则验证是否能通过鉴权
-                    return hasAuthority(username, PasswordUtils.generateSha1(password));
-                }else{//如果不存在的用户，则自动注册
-                    registerUser(username, username, PasswordUtils.generateSha1(password));
+            });
+            sshServer.setPublickeyAuthenticator(new PublickeyAuthenticator() {
+
+                @Override
+                public boolean authenticate(String username, PublicKey key, ServerSession session) {
                     return true;
                 }
+            });
+            try {
+                sshServer.start();
+                logger.info("GitServer has already successful startup!");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        });
-        sshServer.setPublickeyAuthenticator(new PublickeyAuthenticator() {
-
-            @Override
-            public boolean authenticate(String username, PublicKey key, ServerSession session) {
-                return true;
+            httpServer = new HttpServer(getHttpPort(), this.setting.getFileLoader());
+            try {
+                httpServer.start();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        });
-        try {
-            sshServer.start();
-            logger.info("GitServer has already successful startup!");
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-        HttpServer httpServer = new HttpServer(getHttpPort(), this.setting.getFileLoader());
-        try {
-            httpServer.start();
-        } catch (IOException e) {
-            e.printStackTrace();
+        this.state.compareAndSet(1, 2);
+        return this;
+    }
+
+    @Override
+    public GitServer await() throws InterruptedException {
+        while (this.state.get() == RUNNING) {
+            Thread.sleep(1000);
         }
         return this;
+    }
+
+    @Override
+    public void shutdown() throws InterruptedException {
+        this.state.set(STOP);
+        synchronized (this) {
+            httpServer.stop();
+            sshServer.stop();
+        }
     }
 
     @Override
@@ -242,7 +270,7 @@ class GitServerImpl implements GitServer {
     }
 
     @Override
-    public void grantPermission(String repositoryName, String username , String ... operates) {
+    public void grantPermission(String repositoryName, String username, String... operates) {
         permissionService.grantPermission(repositoryName, username, operates);
     }
 

@@ -38,4 +38,6 @@ public interface GitServer extends UserService, PermissionService, RoleService, 
      * 启动Git服务
      */
     GitServer startup() throws UninitializedGitServerException;
+    GitServer await() throws InterruptedException;
+    void shutdown() throws InterruptedException;
 }

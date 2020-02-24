@@ -64,18 +64,16 @@
 		</nav>
 		<div class="container">
 			<div class="row">
-				<div class="col-md-8"><h4 class="pro-title"><span class="glyphicon glyphicon-star-empty"></span> 项目的目录 / 项目的名称</h4></div>
-				<div class="col-md-4 text-right pro-by-user  visible-md-block visible-lg-block"><span class="glyphicon glyphicon-user"></span> 项目来源者</div>
-				<div class="col-md-4 text-left pro-by-user visible-xs-block visible-sm-block"><span class="glyphicon glyphicon-user"></span> 项目来源者</div>
+				<div class="col-md-8"><h4 class="pro-title"><span class="glyphicon glyphicon-user"></span> 系统用户管理</h4></div>
 				<div class="col-md-12">
 					<div class="border-bottom"></div>
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-12 text-right">
-					<a href="add-project.html">
+					<a href="add-user.html">
 					<button type="button" class="btn btn-warning btn-sm">
-					  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 添加项目
+					  <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> 添加用户
 					</button>
 					</a>
 				</div>
@@ -92,15 +90,24 @@
 		<script type="text/javascript">
 			// 模拟数据
 			var tableData = [
-                {id:1001,catalog:"/AA/BB/CC/DD01.txt",version:"1.0",committer:"lilin",memo:"demo..."},
-				{id:1002,catalog:"/AA/BB/CC/DD02.txt",version:"1.0",committer:"lilin",memo:"demo..."},
-				{id:1003,catalog:"/AA/BB/CC/DD03.txt",version:"1.0",committer:"lilin",memo:"demo..."},
-				{id:1004,catalog:"/AA/BB/CC/DD04.txt",version:"1.0",committer:"lilin",memo:"demo..."},
-				{id:1005,catalog:"/AA/BB/CC/DD05.txt",version:"1.0",committer:"lilin",memo:"demo..."},
-				{id:1006,catalog:"/AA/BB/CC/DD06.txt",version:"1.0",committer:"lilin",memo:"demo..."},
-				{id:1007,catalog:"/AA/BB/CC/DD07.txt",version:"1.0",committer:"lilin",memo:"demo..."},
-				{id:1008,catalog:"/AA/BB/CC/DD08.txt",version:"1.0",committer:"lilin",memo:"demo..."},
-				{id:1009,catalog:"/AA/BB/CC/DD09.txt",version:"1.0",committer:"lilin",memo:"demo..."}
+                {id:1001,code:"VIP001",username:"jack",email:"jack@jy.com",status:1},
+				{id:1001,code:"VIP001",username:"jack",email:"jack@jy.com",status:0},
+				{id:1001,code:"VIP001",username:"jack",email:"jack@jy.com",status:0},
+				{id:1001,code:"VIP001",username:"jack",email:"jack@jy.com",status:1},
+				{id:1002,code:"VIP002",username:"jack",email:"jack@jy.com",status:1},
+				{id:1003,code:"VIP003",username:"jack",email:"jack@jy.com",status:0},
+				{id:1004,code:"VIP004",username:"jack",email:"jack@jy.com",status:1},
+				{id:1005,code:"VIP005",username:"jack",email:"jack@jy.com",status:1},
+				{id:1006,code:"VIP006",username:"jack",email:"jack@jy.com",status:1},
+				{id:1007,code:"VIP007",username:"jack",email:"jack@jy.com",status:1},
+				{id:1008,code:"VIP008",username:"jack",email:"jack@jy.com",status:0},
+				{id:1010,code:"VIP009",username:"jack",email:"jack@jy.com",status:1},
+				{id:1011,code:"VIP010",username:"jack",email:"jack@jy.com",status:1},
+				{id:1012,code:"VIP011",username:"jack",email:"jack@jy.com",status:0},
+				{id:1013,code:"VIP012",username:"jack",email:"jack@jy.com",status:0},
+				{id:1014,code:"VIP013",username:"jack",email:"jack@jy.com",status:0},
+				{id:1015,code:"VIP014",username:"jack",email:"jack@jy.com",status:1},
+				{id:1016,code:"VIP015",username:"jack",email:"jack@jy.com",status:1}
             ];
 			$('#table').bootstrapTable({
 				toolbar: '#toolbar',                //工具按钮用哪个容器
@@ -115,17 +122,19 @@
 				data: tableData, 
 				columns: [
 					{
-						field:'catalog',
-						title:'目录',
+						field:'code',
+						title:'编号',
 					},{
-						field:'version',
-						title:'版本',
+						field:'username',
+						title:'用户名',
 					},{
-						field:'committer',
-						title:'提交者',
+						field:'email',
+						title:'邮箱',
 					},{
-						field:'memo',
-						title:'描述',
+						field:'status',
+						title:'状态',
+						align:"center",
+						formatter: statusIcon 
 					},{
 						field:'operate',
 						title:'操作',
@@ -135,8 +144,18 @@
 				],                 
 			});
 			
+			function statusIcon(value, row, index) {
+				var htm = '';
+				if(value==0){
+					htm = '<span class="btn btn-info btn-xs" href="" >有效</span>';
+				}else{
+					htm = '<span class="btn btn-danger btn-xs" href="" >无效</span>';
+				}
+				return htm;
+			}
+			
 			function operation(value, row, index) {
-				var htm = '<a class="btn btn-danger btn-xs" href="" >删除</a>&nbsp;&nbsp;<a class="btn btn-info btn-xs" href="" >详情</a>';
+				var htm = '<a class="btn btn-primary btn-xs" href="" >权限</a>&nbsp;&nbsp;<a class="btn btn-info btn-xs" href="" >重置密码</a>&nbsp;&nbsp;<a class="btn btn-danger btn-xs" href="" >删除</a>';
 				return htm;
 			}
 		</script>

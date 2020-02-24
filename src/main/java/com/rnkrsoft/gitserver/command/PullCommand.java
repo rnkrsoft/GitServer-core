@@ -11,7 +11,7 @@ import org.eclipse.jgit.storage.pack.PackConfig;
 import org.eclipse.jgit.transport.UploadPack;
 
 public final class PullCommand extends AbstractGitCommand {
-	private final static String MSG_REPOSITORY_PERMISSIONS = "Don't have permissions to PULL from this repository.\r\n";
+	private final static String MSG_REPOSITORY_PERMISSIONS = "message: Don't have permissions to PULL from this repository.please make sure registered!\r\n";
 	
 	public PullCommand(String name, GitServer gitServer) {
 		super(name, gitServer);
@@ -22,7 +22,7 @@ public final class PullCommand extends AbstractGitCommand {
 		if(!gitServer.hasPermission(name, session.getUsername(), "pull")) {
 			err.write(MSG_REPOSITORY_PERMISSIONS.getBytes());
 			err.flush();
-			onExit(CommandConstants.CODE_OK, MSG_REPOSITORY_PERMISSIONS);
+			onExit(CommandConstants.CODE_ERROR, MSG_REPOSITORY_PERMISSIONS);
 			return;
 		}
 

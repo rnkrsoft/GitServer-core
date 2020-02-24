@@ -48,40 +48,40 @@
 				</div>
 				<div class="collapse navbar-collapse" id="example-navbar-collapse">
 					<ul class="nav navbar-nav">
-						<li class="active"><a href="#">首页</a></li>
+						<li class="active"><a href="index.html">首页</a></li>
+						<li><a href="sys-user.html">用户管理</a></li>
 						<li><a href="#">使用手册</a></li>
 					</ul>
 					<ul class="nav navbar-nav navbar-right">
 					  <!-- <li><a href="#"><span class="glyphicon glyphicon-user"></span> 注册</a></li> -->
-					  <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> 退出</a></li>
+					  <li><a href="login.html"><span class="glyphicon glyphicon-log-in"></span> 退出</a></li>
 					</ul>
 				</div>
 			</div>
 		</nav>
 		<div class="container">
 			<div class="row">
-				<h3 class="add-pro-title">新建项目</h3>
-			</div>
-			<div class="row">
-				<form>
-					<div class="form-group">
-						<label class="add-pro-label">项目名</label>
-						<input type="pro-name" class="form-control" placeholder="请输入项目名称">
-					</div>
-					<div class="form-group">
-						<label class="add-pro-label">项目描述</label>
-						<input type="pao-memo" class="form-control" placeholder="请输入项目描述">
-					</div>
-					<div class="form-group">
-						<label class="add-pro-label">用户权限</label>
-						<div class="ue-container">
-							<select multiple="multiple" size="10" name="doublebox" id="selectBox" class="form-control">
-							</select>
+				<div class="col-md-12">
+					<h3 class="add-pro-title">新建项目</h3>
+					<form>
+						<div class="form-group">
+							<label class="add-pro-label">项目名</label>
+							<input type="pro-name" class="form-control" placeholder="请输入项目名称">
 						</div>
-							
-					</div>
-					<button type="submit" class="btn btn-warning">确定</button>
-				</form>
+						<div class="form-group">
+							<label class="add-pro-label">项目描述</label>
+							<input type="pao-memo" class="form-control" placeholder="请输入项目描述">
+						</div>
+						<div class="form-group">
+							<label class="add-pro-label">用户权限</label>
+							<div class="ue-container">
+								<select multiple="multiple" size="10" name="doublebox" id="selectBox" class="form-control">
+								</select>
+							</div>
+						</div>
+						<button type="submit" class="btn btn-warning">确定</button>
+					</form>
+				</div>
 			</div>
 		</div>
 		<script src="lib/jquery-1.12.4.js" type="text/javascript" charset="utf-8"></script>

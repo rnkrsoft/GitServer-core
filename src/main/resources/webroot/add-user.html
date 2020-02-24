@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>首页</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link rel="stylesheet" type="text/css" href="lib/bootstrap-3.3.7-dist/css/bootstrap.min.css"/>
+		<style type="text/css">
+			body{
+				font-family: '微软雅黑'
+			}
+			.add-pro-title{
+				font-weight: bold;
+				color: #40485B;
+			}
+			.add-pro-label{
+				color: #40485B;
+				display: block;
+				margin: 0em 0em 0.2857rem 0em;
+				font-size: 1em;
+				font-weight: bold;
+				text-transform: none;
+			}
+			.ue-container {
+			   width:80%;
+			   margin-left: 0;
+			   padding: 9px 5px;
+			   background: #fff;
+		   }
+		   .ue-container label{font-weight: bold;
+				color: #40485B;color: #40485B;
+		   }
+		</style>
+	</head>
+	<body>
+		<nav class="navbar navbar-inverse" role="navigation">
+			<div class="container-fluid"> 
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle" data-toggle="collapse"
+							data-target="#example-navbar-collapse">
+						<span class="sr-only">切换导航</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="#">GitServer</a>
+				</div>
+				<div class="collapse navbar-collapse" id="example-navbar-collapse">
+					<ul class="nav navbar-nav">
+						<li class="active"><a href="index.html">首页</a></li>
+						<li><a href="sys-user.html">用户管理</a></li>
+						<li><a href="#">使用手册</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+					  <!-- <li><a href="#"><span class="glyphicon glyphicon-user"></span> 注册</a></li> -->
+					  <li><a href="login.html"><span class="glyphicon glyphicon-log-in"></span> 退出</a></li>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12">
+					<h3 class="add-pro-title">添加用户</h3>
+					<form>
+						<div class="form-group">
+							<label class="add-pro-label">用户</label>
+							<input type="pro-name" class="form-control" placeholder="请输入项目名称">
+						</div>
+						<div class="form-group">
+							<label class="add-pro-label">权限</label>
+							<label class="checkbox-inline">
+							  <input type="checkbox" id="inlineCheckbox1" value="option1"> 创建
+							</label>
+							<label class="checkbox-inline">
+							  <input type="checkbox" id="inlineCheckbox2" value="option2"> 删除
+							</label>
+						</div>
+						<div class="form-group">
+							<label class="add-pro-label">库权限</label>
+							<table class="col-md-5 table table-bordered ">
+								<thead>
+									<tr>
+										<th>项目名</th>
+										<th>
+											<label class="checkbox-inline">
+											  <input type="checkbox" value="option1" onclick="selectAll(this.checked, '.getSource')" class="getSource"> 拉取权限
+											</label>
+										</th>
+										<th>
+											<label class="checkbox-inline">
+											  <input type="checkbox" value="option2" onclick="selectAll(this.checked, '.sendRight')" class="sendRight" id="sendRightAll"> 推送权限
+											</label>
+										</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>这是项目01</td>
+										<td>
+											<label class="checkbox-inline">
+											  <input type="checkbox" value="option1" class="getSource"> 拉取
+											</label>
+										</td>
+										<td>
+											<label class="checkbox-inline">
+											  <input type="checkbox" value="option2" class="sendRight"> 推送
+											</label>
+										</td>
+									</tr>
+									<tr>
+										<td>这是项目02</td>
+										<td>
+											<label class="checkbox-inline">
+											  <input type="checkbox" value="option1" class="getSource"> 拉取
+											</label>
+										</td>
+										<td>
+											<label class="checkbox-inline">
+											  <input type="checkbox" value="option2" class="sendRight"> 推送
+											</label>
+										</td>
+									</tr>
+									<tr>
+										<td>这是项目03</td>
+										<td>
+											<label class="checkbox-inline">
+											  <input type="checkbox" value="option1" class="getSource"> 拉取
+											</label>
+										</td>
+										<td>
+											<label class="checkbox-inline">
+											  <input type="checkbox" value="option2" class="sendRight"> 推送
+											</label>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<button type="submit" class="btn btn-warning">确定</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		<script src="lib/jquery-1.12.4.js" type="text/javascript" charset="utf-8"></script>
+		<script src="lib/bootstrap-3.3.7-dist/js/bootstrap.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			function selectAll(selectStatus, classSelect){//传入参数（全选框的选中状态）
+			  //根据name属性获取到单选框的input，使用each方法循环设置所有单选框的选中状态
+			  if(selectStatus){
+				$(classSelect).each(function(i,n){
+				  n.checked = true;
+				});
+			  }else{
+				$(classSelect).each(function(i,n){
+				  n.checked = false;
+				});
+			  }
+			}
+			
+			// 判断是否全不选,则取消全选复选框选择中状态
+			$(".sendRight").click(function(){
+				$(this).each(function(i,n){
+					alert(1);
+				  if(n.checked == false){
+					$("#sendRightAll").checked=false;
+				  }else{
+					break;  
+				  }
+				});
+			});
+		</script>
+	</body>
+</html>

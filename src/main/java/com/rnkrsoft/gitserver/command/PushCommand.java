@@ -13,7 +13,7 @@ import org.eclipse.jgit.transport.ReceivePack;
  * Receives change upload over SSH using the Git receive-pack protocol.
  */
 public final class PushCommand extends AbstractGitCommand {
-	private final static String MSG_REPOSITORY_PERMISSIONS = "Don't have permissions to PUSH in this repository.\r\n";
+	private final static String MSG_REPOSITORY_PERMISSIONS = "message: Don't have permissions to PUSH in this repository.please make sure registered!\r\n";
 	
 	public PushCommand(String name, GitServer gitServer) {
 		super(name, gitServer);

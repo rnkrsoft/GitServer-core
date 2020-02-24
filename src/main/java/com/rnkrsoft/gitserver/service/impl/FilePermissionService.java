@@ -37,6 +37,9 @@ public class FilePermissionService implements PermissionService {
             }
         }
         File permissionFile = new File(repositoryDir, username + ".json");
+        if (!permissionFile.exists()){
+            return false;
+        }
         PermissionEntity permission = null;
         try {
             String json = FileUtils.readFileToString(permissionFile, Charset.forName("UTF-8"));
