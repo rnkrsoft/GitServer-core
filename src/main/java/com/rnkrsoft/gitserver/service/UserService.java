@@ -1,9 +1,15 @@
 package com.rnkrsoft.gitserver.service;
 
 import com.rnkrsoft.gitserver.entity.UserEntity;
+import com.rnkrsoft.gitserver.service.domain.QueryUsersRequest;
+import com.rnkrsoft.gitserver.service.domain.QueryUsersResponse;
+import com.rnkrsoft.gitserver.service.domain.UpdateUserRequest;
 
 import java.util.List;
-
+/**
+ * 用户服务
+ * Created by woate on 2020/02/24.
+ */
 public interface UserService {
     /**
      * 注册用户
@@ -15,23 +21,27 @@ public interface UserService {
 
     /**
      * 修改指定用户名的用户信息
-     * @param username 用户名
-     * @param email 邮箱地址
-     * @param password 用户输入的密码
+     * @param request
      */
-    void updateUser(String username, String email, String password);
+    void updateUser(UpdateUserRequest request);
 
     /**
      * 删除指定的用户
      * @param username 用户名
      */
     void deleteUser(String username);
-
     /**
      * 列出所有的用户列表
      * @return 用户列表
      */
     List<UserEntity> listUsers();
+
+    /**
+     * 分页查询用户列表
+     * @param request 请求
+     * @return 应答
+     */
+    QueryUsersResponse queryUsers(QueryUsersRequest request);
 
     /**
      * 是否有这个用户，并非鉴权，而只是检查是否注册

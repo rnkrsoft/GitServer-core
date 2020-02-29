@@ -1,40 +1,23 @@
 package com.rnkrsoft.gitserver.entity;
 
-public class RoleEntity {
-    /**
-     * 角色名称，显示为英文
-     */
+import com.rnkrsoft.orm.BaseEntity;
+import com.rnkrsoft.orm.annotation.*;
+import lombok.Data;
+
+@Data
+@Comment("角色信息表")
+@Table(name = "tb_user_info")
+public class RoleEntity extends BaseEntity {
+    @PrimaryKey(strategy = PrimaryKeyStrategy.NONE)
+    @StringColumn(name = "role_name", nullable = false)
+    @Comment("角色名称，显示为英文")
     String roleName;
-    /**
-     * 角色描述，显示为中文
-     */
+
+    @StringColumn(name = "role_desc", nullable = false)
+    @Comment("角色描述，显示为中文")
     String roleDesc;
-    /**
-     * 当前角色是否失效
-     */
+
+    @NumberColumn(name = "valid", defaultValue = "1", nullable = false)
+    @Comment("当前角色是否失效")
     boolean valid;
-
-    public String getRoleName() {
-        return roleName;
-    }
-
-    public void setRoleName(String roleName) {
-        this.roleName = roleName;
-    }
-
-    public String getRoleDesc() {
-        return roleDesc;
-    }
-
-    public void setRoleDesc(String roleDesc) {
-        this.roleDesc = roleDesc;
-    }
-
-    public boolean isValid() {
-        return valid;
-    }
-
-    public void setValid(boolean valid) {
-        this.valid = valid;
-    }
 }

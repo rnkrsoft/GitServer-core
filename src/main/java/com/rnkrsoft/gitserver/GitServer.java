@@ -12,6 +12,9 @@ import com.rnkrsoft.gitserver.service.UserService;
  * Created by woate on 2020/02/24.
  */
 public interface GitServer extends UserService, PermissionService, RoleService, RepositoryService {
+    int STOP = 0;
+    int INIT = 1;
+    int RUNNING = 2;
     /**
      * 获取仓库根目录
      * @return 仓库根目录
@@ -39,6 +42,30 @@ public interface GitServer extends UserService, PermissionService, RoleService, 
      * 启动Git服务
      */
     GitServer startup() throws UninitializedGitServerException;
+
+    /**
+     * 检查服务器状态
+     * @return
+     */
+    int getState();
+
+    /**
+     * 更新状态
+     * @param expected
+     * @param newState
+     * @return
+     */
+    GitServer updateState(int expected, int newState);
+    /**
+     * 启动服务后主线程进入等待
+     * @return Git服务
+     * @throws InterruptedException
+     */
     GitServer await() throws InterruptedException;
+
+    /**
+     * 关闭服务
+     * @throws InterruptedException
+     */
     void shutdown() throws InterruptedException;
 }

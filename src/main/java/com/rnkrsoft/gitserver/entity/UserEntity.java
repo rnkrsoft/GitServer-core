@@ -1,33 +1,33 @@
 package com.rnkrsoft.gitserver.entity;
 
+import com.rnkrsoft.orm.BaseEntity;
+import com.rnkrsoft.orm.annotation.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
-public class UserEntity implements Serializable {
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Comment("用户信息表")
+@Table(name = "tb_user_info")
+public class UserEntity extends BaseEntity {
+    @PrimaryKey(strategy = PrimaryKeyStrategy.NONE)
+    @StringColumn(name = "username", nullable = false)
+    @Comment("用户名")
     String username;
+
+    @StringColumn(name = "email", nullable = false)
+    @Comment("电子邮箱")
     String email;
+
+    @StringColumn(name = "password", nullable = false)
+    @Comment("密码")
     String password;
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    @NumberColumn(name = "valid", defaultValue = "1", nullable = false)
+    @Comment("是否有效")
+    boolean valid;
 }

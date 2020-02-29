@@ -5,8 +5,8 @@ import java.util.regex.Pattern;
 
 import com.rnkrsoft.gitserver.GitServer;
 import com.rnkrsoft.gitserver.exception.InvalidGitParameterException;
-import com.rnkrsoft.gitserver.log.Logger;
-import com.rnkrsoft.gitserver.log.LoggerFactory;
+import com.rnkrsoft.log.Logger;
+import com.rnkrsoft.log.LoggerFactory;
 
 import org.apache.sshd.server.Command;
 import org.apache.sshd.server.CommandFactory;

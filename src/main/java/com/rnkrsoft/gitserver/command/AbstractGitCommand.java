@@ -5,8 +5,9 @@ import java.io.IOException;
 
 import com.rnkrsoft.gitserver.GitServer;
 import com.rnkrsoft.gitserver.exception.RepositoryCreateFailureException;
-import com.rnkrsoft.gitserver.log.Logger;
-import com.rnkrsoft.gitserver.log.LoggerFactory;
+import com.rnkrsoft.gitserver.exception.UninitializedGitServerException;
+import com.rnkrsoft.log.Logger;
+import com.rnkrsoft.log.LoggerFactory;
 
 import org.apache.sshd.server.Environment;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
@@ -43,7 +44,7 @@ public abstract class AbstractGitCommand extends BaseCommand {
             repo = gitServer.openRepository(getRepositoryMapping()).getRepository();
         } catch (RepositoryNotFoundException e1) {
             try {
-                gitServer.createRepository(getRepositoryMapping());
+                gitServer.createRepository(getRepositoryMapping(), "");
                 repo = gitServer.openRepository(getRepositoryMapping()).getRepository();
             } catch (RepositoryCreateFailureException e) {
                 logger.error("Repository not found.", e1);
@@ -53,7 +54,14 @@ public abstract class AbstractGitCommand extends BaseCommand {
                 logger.error("Repository not found.", e1);
                 onExit(CommandConstants.CODE_ERROR, MSG_REPOSITORY_NOT_FOUND);
                 return;
+            } catch (UninitializedGitServerException e) {
+                logger.error("GitServer is not init.", e);
+                onExit(CommandConstants.CODE_ERROR, MSG_REPOSITORY_NOT_FOUND);
             }
+        } catch (UninitializedGitServerException e) {
+            logger.error("GitServer is not init.", e);
+            onExit(CommandConstants.CODE_ERROR, MSG_REPOSITORY_NOT_FOUND);
+            return;
         }
 
         try {

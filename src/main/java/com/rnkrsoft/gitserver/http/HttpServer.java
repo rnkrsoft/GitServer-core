@@ -1,17 +1,24 @@
 package com.rnkrsoft.gitserver.http;
 
 import com.rnkrsoft.gitserver.http.loader.FileLoader;
-import com.rnkrsoft.gitserver.log.Logger;
-import com.rnkrsoft.gitserver.log.LoggerFactory;
+import com.rnkrsoft.log.Logger;
+import com.rnkrsoft.log.LoggerFactory;
+import org.apache.commons.io.IOUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by woate on 2020/02/24.
  */
 public class HttpServer extends NanoHTTPD {
+    public static final String LOGIN = "/login.do";
+    public static final String LOGOUT = "/logout.do";
+    public static final String AJAX = "/ajax.do";
     /**
      * 二进制流类型
      */
@@ -33,6 +40,49 @@ public class HttpServer extends NanoHTTPD {
 
     protected Response serve(IHTTPSession session) {
         String uri = session.getUri();
+        if (LOGIN.equals(uri)){
+            return login(session);
+        }else if (LOGOUT.equals(uri)){
+            return logout(session);
+        }else if (AJAX.equals(uri)){
+            return ajax(session);
+        }else{
+            return staticResource(session, uri);
+        }
+    }
+
+    public Response login(IHTTPSession session){
+
+        try {
+            Map parms = new HashMap();
+            session.parseBody(parms);
+            System.out.println(parms);
+
+            Map<String, List<String>> parameters = session.getParameters();
+            System.out.println(parameters);
+            System.out.println(session.getParms());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ResponseException e) {
+            e.printStackTrace();
+        }
+        return Response.newFixedLengthResponse("login success!");
+    }
+
+    public Response logout(IHTTPSession session){
+        return Response.newFixedLengthResponse("logout success!");
+    }
+
+    public Response ajax(IHTTPSession session){
+        try {
+           String str =  IOUtils.toString(session.getInputStream(), "UTF-8");
+            System.out.println(str);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Response.newFixedLengthResponse("ajax success!");
+    }
+    public Response staticResource(IHTTPSession session, String uri){
         logger.debug("access:{}", uri);
         String filename = uri.substring(1);
 
@@ -57,7 +107,6 @@ public class HttpServer extends NanoHTTPD {
             return response404(session, uri);
         }
     }
-
     /**
      * 发生内部错误
      * @param session
