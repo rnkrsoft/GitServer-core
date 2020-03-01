@@ -1,5 +1,6 @@
 package com.rnkrsoft.orm.util;
 
+import com.rnkrsoft.orm.annotation.DatabaseType;
 import com.rnkrsoft.util.StringUtils;
 import com.rnkrsoft.interfaces.EnumBase;
 import com.rnkrsoft.interfaces.EnumIntegerCode;
@@ -189,33 +190,35 @@ public abstract class SqlScriptUtils {
                 sql.append(convert(" ON UPDATE CURRENT_TIMESTAMP", keywordMode));
             }
             if (columnMetadata.getComment() != null && !columnMetadata.getComment().trim().isEmpty()) {
-                sql.append(convert(" COMMENT '", keywordMode)).append(columnMetadata.getComment());
-                if (columnMetadata.getEnumClass() != null
-                        && columnMetadata.getEnumClass() != EnumBase.class
-                        && columnMetadata.getEnumClass() != EnumStringCode.class
-                        && columnMetadata.getEnumClass() != EnumIntegerCode.class
-                ) {
-                    if (EnumBase.class.isAssignableFrom(columnMetadata.getEnumClass())) {
-                        if (EnumStringCode.class.isAssignableFrom(columnMetadata.getEnumClass())) {
-                            sql.append(" ");
-                            for (Object val : columnMetadata.getEnumClass().getEnumConstants()) {
-                            }
-                        } else if (EnumIntegerCode.class.isAssignableFrom(columnMetadata.getEnumClass())) {
-                            sql.append(" ");
-                            for (Object val : columnMetadata.getEnumClass().getEnumConstants()) {
+               if (tableMetadata.getType() == DatabaseType.Oracle || tableMetadata.getType() == DatabaseType.Sqlite){
+                   sql.append(convert(" COMMENT '", keywordMode)).append(columnMetadata.getComment());
+                   if (columnMetadata.getEnumClass() != null
+                           && columnMetadata.getEnumClass() != EnumBase.class
+                           && columnMetadata.getEnumClass() != EnumStringCode.class
+                           && columnMetadata.getEnumClass() != EnumIntegerCode.class
+                   ) {
+                       if (EnumBase.class.isAssignableFrom(columnMetadata.getEnumClass())) {
+                           if (EnumStringCode.class.isAssignableFrom(columnMetadata.getEnumClass())) {
+                               sql.append(" ");
+                               for (Object val : columnMetadata.getEnumClass().getEnumConstants()) {
+                               }
+                           } else if (EnumIntegerCode.class.isAssignableFrom(columnMetadata.getEnumClass())) {
+                               sql.append(" ");
+                               for (Object val : columnMetadata.getEnumClass().getEnumConstants()) {
 
-                            }
-                        } else {
+                               }
+                           } else {
 
-                        }
-                    }
-                }
-                sql.append("'");
+                           }
+                       }
+                   }
+                   sql.append("'");
+               }
             }
             sql.append(",").append(System.getProperty("line.separator"));
         }
 
-        sql.append(primaryKey(tableMetadata.getPrimaryKeyColumns(), sqlMode, keywordMode) + System.getProperty("line.separator"));
+        sql.append(primaryKey(tableMetadata.getPrimaryKeyColumnNameList(), sqlMode, keywordMode) + System.getProperty("line.separator"));
         sql.append(") ");
         if (autoIncrementCnt > 1) {
             throw new IllegalArgumentException(tableMetadata.getTableName() + "自增主键只允许一个");
@@ -226,7 +229,9 @@ public abstract class SqlScriptUtils {
         }
         //如果实体类上有注解
         if (!StringUtils.isBlank(tableMetadata.getComment())) {
-            sql.append(convert("COMMENT = '", keywordMode) + tableMetadata.getComment() + "'");
+            if (tableMetadata.getType() == DatabaseType.Oracle){
+                sql.append(convert("COMMENT = '", keywordMode) + tableMetadata.getComment() + "'");
+            }
         }
         os.write(sql.toString().getBytes());
     }

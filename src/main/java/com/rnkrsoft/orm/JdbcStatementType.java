@@ -10,7 +10,9 @@ public enum JdbcStatementType implements EnumIntegerCode {
     UPDATE_PRIMARY_KEY(5, "修改"),
     UPDATE_PRIMARY_KEY_SELECTIVE(6, "修改"),
     SELECT_PRIMARY_KEY(7, "查询"),
-    SELECT_SELECTIVE(8, "查询");
+    SELECT_SELECTIVE(8, "查询"),
+    COUNT_SELECTIVE(9, "查询"),
+    PAGINATION_SELECT_SELECTIVE(10, "查询");
     int code;
     String desc;
 

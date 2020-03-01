@@ -95,6 +95,7 @@ public class Pagination<T> {
         }
         this.pageNum = (total + pageSize -1 ) / pageSize;
     }
+
     public void setTotal(int total) {
         this.total = total;
         //如果设置了总条数，不执行统计
@@ -121,6 +122,10 @@ public class Pagination<T> {
 
     public int getPageNum() {
         return pageNum;
+    }
+
+    public int getSkipRecordNum(){
+        return this.pageSize * (this.getCurPageNo() - 1);
     }
 
     public boolean isReady() {

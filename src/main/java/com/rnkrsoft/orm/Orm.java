@@ -3,7 +3,6 @@ package com.rnkrsoft.orm;
 import com.rnkrsoft.orm.extractor.EntityExtractorHelper;
 import com.rnkrsoft.orm.generator.JdbcStatement;
 import com.rnkrsoft.orm.metadata.ColumnMetadata;
-import com.rnkrsoft.orm.metadata.DynamicMetadata;
 import com.rnkrsoft.orm.metadata.TableMetadata;
 import com.rnkrsoft.util.MessageFormatter;
 import com.rnkrsoft.util.ValueUtils;
@@ -72,6 +71,14 @@ public class Orm {
         Connection connection = DriverManager.getConnection(this.setting.getJdbcUrl(), this.setting.getUsername(), this.setting.getPassword());
         return connection;
     }
+
+    /**
+     * 执行自定义具有占位符的SQL语句
+     * @param sql 带有占位符的SQL语句
+     * @param values 值数组与占位符匹配
+     * @return 变更条数
+     * @throws SQLException 数据库异常
+     */
     public int executeUpdate(String sql, Object... values) throws SQLException {
         Connection conn = getConnect(true);
         PreparedStatement ps = null;
@@ -107,11 +114,11 @@ public class Orm {
 
     /**
      * 执行查询
-     *
-     * @param sql       带有占位符的sql语句
-     * @param rowMapper 行映射器
-     * @param values    占位符对应的值
-     * @return 查询结果
+     * @param statement
+     * @param rowMapper
+     * @param <T>
+     * @return
+     * @throws SQLException
      */
     <T> List<T> executeQuery(JdbcStatement statement, RowMapper<T> rowMapper) throws SQLException {
         Connection conn = getConnect(false);
@@ -165,6 +172,12 @@ public class Orm {
         return object;
     }
 
+    /**
+     * 设置占位符对应的值
+     * @param ps
+     * @param values
+     * @throws SQLException
+     */
     void setParameter(PreparedStatement ps, Object[] values) throws SQLException {
         int columnSize = values.length;
         for (int i = 0; i < columnSize; i++) {
@@ -183,7 +196,7 @@ public class Orm {
         for (int i = 0; i < columnSize; i++) {
             ColumnMetadata columnMetadata = columnMetadataList.get(i);
             Class javaType = columnMetadata.getJavaType();
-            Object value = ValueUtils.convert(statement.getValues().get(i), javaType);
+            Object value = ValueUtils.convert(statement.getValues()[i], javaType);
             ps.setObject(i + 1, value);
         }
     }

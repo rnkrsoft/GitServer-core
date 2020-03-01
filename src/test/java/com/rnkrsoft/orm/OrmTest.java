@@ -38,6 +38,7 @@ public class OrmTest {
                 .jdbcDriverClassName("org.sqlite.JDBC")
                 .jdbcUrl("jdbc:sqlite:sample.db")
                 .build());
+        Orm.INSTANCE.executeUpdate("drop table demo");
 //        Orm.INSTANCE.executeUpdate("create table demo(name varchar(20), age int)");
 //        Orm.INSTANCE.executeUpdate("insert into demo(name, age) values('1234', 20)");
     }

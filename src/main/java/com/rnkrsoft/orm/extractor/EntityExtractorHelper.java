@@ -2,11 +2,11 @@ package com.rnkrsoft.orm.extractor;
 
 import com.rnkrsoft.logtrace.ErrorContextFactory;
 import com.rnkrsoft.orm.JdbcStatementType;
+import com.rnkrsoft.orm.Pagination;
 import com.rnkrsoft.orm.annotation.*;
 import com.rnkrsoft.orm.generator.JdbcStatement;
 import com.rnkrsoft.orm.generator.JdbcStatementGenerator;
 import com.rnkrsoft.orm.metadata.ColumnMetadata;
-import com.rnkrsoft.orm.metadata.DynamicMetadata;
 import com.rnkrsoft.orm.metadata.TableMetadata;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,7 +18,7 @@ import java.util.*;
  */
 @Slf4j
 public final class EntityExtractorHelper {
-
+    static Map<String, JdbcStatement> STATEMENT_CACHE = new HashMap<String, JdbcStatement>();
     EntityExtractor extractor;
 
     public static final Map<Class, TableMetadata> TABLES_CACHE = new HashMap<Class, TableMetadata>();
@@ -92,13 +92,24 @@ public final class EntityExtractorHelper {
         }
     }
 
-    public JdbcStatement dynamic(TableMetadata tableMetadata, JdbcStatementType type, Object entity) {
+    public JdbcStatement dynamic(TableMetadata tableMetadata, JdbcStatementType type, Object obj) {
+        JdbcStatement statement = null;
+        if (type == JdbcStatementType.INSERT || type == JdbcStatementType.DELETE_PRIMARY_KEY || type == JdbcStatementType.UPDATE_PRIMARY_KEY){
+            statement = STATEMENT_CACHE.get(tableMetadata.getTableName() + "@" + type.getCode());
+        }
+        if (statement != null){
+            return statement;
+        }
         Collection<ColumnMetadata> columnMetadataList = tableMetadata.getColumnMetadataSet().values();
-        String placeholderSql = null;
         int maxColumnSize = columnMetadataList.size();
         ColumnMetadata[] noneNullColumns = new ColumnMetadata[maxColumnSize];
-        Object[] values = new Object[maxColumnSize];
         int i = 0;
+        Object entity = null;
+        if (obj instanceof Pagination){
+            entity = ((Pagination)obj).getEntity();
+        }else{
+            entity = obj;
+        }
         for (ColumnMetadata columnMetadata : columnMetadataList) {
             Object val = columnMetadata.getValue(entity);
             if (val == null) {
@@ -108,8 +119,10 @@ public final class EntityExtractorHelper {
             i++;
         }
         noneNullColumns = Arrays.copyOf(noneNullColumns, i);
-        JdbcStatement statement = new JdbcStatement(type, tableMetadata, noneNullColumns, entity);
-        JdbcStatementGenerator.placeholderSql(statement);
+        if (statement == null){
+            statement = new JdbcStatement(type, tableMetadata, noneNullColumns, obj);
+            JdbcStatementGenerator.placeholderSql(statement);
+        }
         return statement;
     }
 }

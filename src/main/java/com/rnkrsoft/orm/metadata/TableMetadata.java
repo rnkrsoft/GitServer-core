@@ -1,6 +1,7 @@
 package com.rnkrsoft.orm.metadata;
 
 import com.rnkrsoft.orm.JdbcStatementType;
+import com.rnkrsoft.orm.annotation.DatabaseType;
 import com.rnkrsoft.util.StringUtils;
 import lombok.*;
 
@@ -64,6 +65,10 @@ public class TableMetadata<T> {
      */
     String dataEngine;
     /**
+     * 数据库类型
+     */
+    DatabaseType type;
+    /**
      * 当前已自增到的数值
      */
     Long autoIncrement;
@@ -79,7 +84,6 @@ public class TableMetadata<T> {
      * 表后缀
      */
     String suffix = "";
-    String sqlHeader = null;
 
     /**
      * 增加字段定义
@@ -301,5 +305,13 @@ public class TableMetadata<T> {
 
     public void setSuffix(String suffix) {
         this.suffix = suffix;
+    }
+
+    public DatabaseType getType() {
+        return type;
+    }
+
+    public void setType(DatabaseType type) {
+        this.type = type;
     }
 }

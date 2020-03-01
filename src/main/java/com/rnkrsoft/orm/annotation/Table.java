@@ -54,4 +54,10 @@ public @interface Table {
      * @since 1.0.0
      */
     WordMode sqlMode() default WordMode.upperCase;
+
+    /**
+     * 数据库类型
+     * @return 数据库类型
+     */
+    DatabaseType type() default DatabaseType.MySQL;
 }

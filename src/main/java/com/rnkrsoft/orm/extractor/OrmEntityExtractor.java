@@ -26,6 +26,7 @@ public class OrmEntityExtractor implements EntityExtractor {
             tableMetadata.setSchema(tableAnn.schema());
             tableMetadata.setPrefix(tableAnn.prefix());
             tableMetadata.setSuffix(tableAnn.suffix());
+            tableMetadata.setType(tableAnn.type());
         }
         //提取表注释
         if (commentAnn != null && commentAnn.value() != null) {

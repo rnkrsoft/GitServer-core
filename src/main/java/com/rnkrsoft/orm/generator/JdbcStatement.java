@@ -1,6 +1,7 @@
 package com.rnkrsoft.orm.generator;
 
 import com.rnkrsoft.orm.JdbcStatementType;
+import com.rnkrsoft.orm.Pagination;
 import com.rnkrsoft.orm.metadata.ColumnMetadata;
 import com.rnkrsoft.orm.metadata.TableMetadata;
 import lombok.Getter;
@@ -17,19 +18,33 @@ public class JdbcStatement {
     @Getter
     Object entity;
     @Getter
+    Pagination pagination;
+    @Getter
     final ColumnMetadata[] nonNullColumns;
     @Getter
     @Setter
     String placeholderSql;
     @Getter
-    final List<Object> values = new ArrayList<Object>();
-    @Getter
     final List<ColumnMetadata> columns = new ArrayList<ColumnMetadata>();
 
-    public JdbcStatement(JdbcStatementType type, TableMetadata tableMetadata, ColumnMetadata[] nonNullColumns, Object entity) {
+    public JdbcStatement(JdbcStatementType type, TableMetadata tableMetadata, ColumnMetadata[] nonNullColumns, Object obj) {
         this.type = type;
         this.tableMetadata = tableMetadata;
         this.nonNullColumns = nonNullColumns;
-        this.entity = entity;
+        if (obj instanceof Pagination){
+            pagination = (Pagination)obj;
+            entity = pagination.getEntity();
+        }else{
+            entity = obj;
+        }
+    }
+
+    public Object[] getValues(){
+        Object[] values = new Object[columns.size()];
+        int columnSize = columns.size();
+        for (int i = 0; i < columnSize; i++) {
+            values[i] =  columns.get(i).getValue(entity);
+        }
+        return values;
     }
 }
