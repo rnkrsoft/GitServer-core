@@ -1,7 +1,7 @@
 package com.rnkrsoft.orm.metadata;
 
 import com.rnkrsoft.interfaces.EnumBase;
-import com.rnkrsoft.orm.SupportedJdbcType;
+import com.rnkrsoft.orm.jdbc.SupportedJdbcType;
 import com.rnkrsoft.orm.annotation.LogicMode;
 import com.rnkrsoft.orm.annotation.PrimaryKeyStrategy;
 import com.rnkrsoft.orm.annotation.ValueMode;
@@ -12,6 +12,10 @@ import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Field;
 
+/**
+ * Created by woate on 2020/3/1.
+ * 字段元数据
+ */
 @Data
 @EqualsAndHashCode
 @NoArgsConstructor
@@ -104,7 +108,7 @@ public class ColumnMetadata {
     /**
      * 作为条件时的值模式
      */
-    ValueMode valueMode = ValueMode.EQUAL;
+    ValueMode valueMode = ValueMode.EQ;
 
     public ColumnMetadata(boolean primaryKey, TableMetadata tableMetadata, Class entityClass, Field columnField, String javaName, Class javaType, String jdbcName, String fullJdbcType, Integer length, Integer precision, Integer scale, SupportedJdbcType jdbcType, Boolean nullable, Class enumClass, String comment, PrimaryKeyStrategy primaryKeyStrategy, String primaryKeyFeature, String defaultValue, Boolean autoIncrement, Boolean onUpdateCurrentTimestamp, LogicMode logicMode, ValueMode valueMode) {
         this.primaryKey = primaryKey;
@@ -114,7 +118,7 @@ public class ColumnMetadata {
         this.javaName = javaName;
         this.javaType = javaType;
         this.jdbcName = jdbcName;
-        this.fullJdbcType = fullJdbcType == null ? "VARCHAR(255)": fullJdbcType;
+        this.fullJdbcType = fullJdbcType == null ? "VARCHAR(255)" : fullJdbcType;
         this.length = length;
         this.precision = precision;
         this.scale = scale;
@@ -128,7 +132,7 @@ public class ColumnMetadata {
         this.autoIncrement = autoIncrement == null ? false : autoIncrement;
         this.onUpdateCurrentTimestamp = onUpdateCurrentTimestamp == null ? false : autoIncrement;
         this.logicMode = logicMode == null ? LogicMode.AND : logicMode;
-        this.valueMode = valueMode == null ? ValueMode.EQUAL : valueMode;
+        this.valueMode = valueMode == null ? ValueMode.EQ : valueMode;
     }
 
     @Override
@@ -162,7 +166,7 @@ public class ColumnMetadata {
             this.columnField.set(obj, val);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             this.columnField.setAccessible(false);
         }
     }
@@ -174,7 +178,7 @@ public class ColumnMetadata {
             val = (T) this.columnField.get(obj);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-        }finally {
+        } finally {
             this.columnField.setAccessible(false);
         }
         return val;

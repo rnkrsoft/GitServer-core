@@ -1,24 +1,21 @@
 package com.rnkrsoft.orm.extractor;
 
 import com.rnkrsoft.logtrace.ErrorContextFactory;
-import com.rnkrsoft.orm.JdbcStatementType;
-import com.rnkrsoft.orm.Pagination;
 import com.rnkrsoft.orm.annotation.*;
-import com.rnkrsoft.orm.generator.JdbcStatement;
-import com.rnkrsoft.orm.generator.JdbcStatementGenerator;
 import com.rnkrsoft.orm.metadata.ColumnMetadata;
 import com.rnkrsoft.orm.metadata.TableMetadata;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
+ * Created by woate on 2020/3/1.
  * 实体信息提取器
  */
 @Slf4j
 public final class EntityExtractorHelper {
-    static Map<String, JdbcStatement> STATEMENT_CACHE = new HashMap<String, JdbcStatement>();
     EntityExtractor extractor;
 
     public static final Map<Class, TableMetadata> TABLES_CACHE = new HashMap<Class, TableMetadata>();
@@ -90,39 +87,5 @@ public final class EntityExtractorHelper {
             //将最终的字段元信息放入表中
             tableMetadata.addColumn(columnMetadata);
         }
-    }
-
-    public JdbcStatement dynamic(TableMetadata tableMetadata, JdbcStatementType type, Object obj) {
-        JdbcStatement statement = null;
-        if (type == JdbcStatementType.INSERT || type == JdbcStatementType.DELETE_PRIMARY_KEY || type == JdbcStatementType.UPDATE_PRIMARY_KEY){
-            statement = STATEMENT_CACHE.get(tableMetadata.getTableName() + "@" + type.getCode());
-        }
-        if (statement != null){
-            return statement;
-        }
-        Collection<ColumnMetadata> columnMetadataList = tableMetadata.getColumnMetadataSet().values();
-        int maxColumnSize = columnMetadataList.size();
-        ColumnMetadata[] noneNullColumns = new ColumnMetadata[maxColumnSize];
-        int i = 0;
-        Object entity = null;
-        if (obj instanceof Pagination){
-            entity = ((Pagination)obj).getEntity();
-        }else{
-            entity = obj;
-        }
-        for (ColumnMetadata columnMetadata : columnMetadataList) {
-            Object val = columnMetadata.getValue(entity);
-            if (val == null) {
-                continue;
-            }
-            noneNullColumns[i] = columnMetadata;
-            i++;
-        }
-        noneNullColumns = Arrays.copyOf(noneNullColumns, i);
-        if (statement == null){
-            statement = new JdbcStatement(type, tableMetadata, noneNullColumns, obj);
-            JdbcStatementGenerator.placeholderSql(statement);
-        }
-        return statement;
     }
 }

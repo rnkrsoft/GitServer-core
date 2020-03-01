@@ -8,15 +8,16 @@ public final class GitServerFactory {
 
     /**
      * 获取Git服务
+     *
      * @return Git服务
      */
-    public static GitServer getInstance(){
-        if (SERVER != null){
+    public static GitServer getInstance() {
+        if (SERVER != null) {
             return SERVER;
         }
 
-        synchronized (GitServerFactory.class){
-            if (SERVER != null){
+        synchronized (GitServerFactory.class) {
+            if (SERVER != null) {
                 return SERVER;
             }
             SERVER = new GitServerImpl();

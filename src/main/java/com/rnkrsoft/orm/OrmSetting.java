@@ -2,10 +2,12 @@ package com.rnkrsoft.orm;
 
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+/**
+ * Created by woate on 2020/03/01.
+ * ORM 配置类
+ */
 @Getter
 public final class OrmSetting {
     final Set<Class> entityClasses = new HashSet<Class>();
@@ -13,25 +15,26 @@ public final class OrmSetting {
     String jdbcUrl;
     String username;
     String password;
+
     private OrmSetting() {
     }
 
-    public static OrmSettingBuilder builder(){
+    public static OrmSettingBuilder builder() {
         return new OrmSettingBuilder();
     }
 
-    public static class OrmSettingBuilder{
+    public static class OrmSettingBuilder {
         final Set<Class> entityClasses = new HashSet<Class>();
         String jdbcDriverClassName;
         String jdbcUrl;
         String username;
         String password;
 
-        public OrmSettingBuilder entityClass(Class ... entityClasses){
-           for (Class clazz : entityClasses){
-               this.entityClasses.add(clazz);
-           }
-           return this;
+        public OrmSettingBuilder entityClass(Class... entityClasses) {
+            for (Class clazz : entityClasses) {
+                this.entityClasses.add(clazz);
+            }
+            return this;
         }
 
         public OrmSettingBuilder jdbcDriverClassName(String jdbcDriverClassName) {
@@ -54,7 +57,7 @@ public final class OrmSetting {
             return this;
         }
 
-        public OrmSetting build(){
+        public OrmSetting build() {
             OrmSetting setting = new OrmSetting();
             setting.entityClasses.addAll(this.entityClasses);
             setting.jdbcDriverClassName = this.jdbcDriverClassName;

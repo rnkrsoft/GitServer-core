@@ -36,6 +36,7 @@ public class ClassUtils {
 
     /**
      * 获取当前的方法名
+     *
      * @param simple 是否为简写
      * @param offset 偏移，用于获取更上一级的调用类
      * @param method 是否包含方法名
@@ -57,17 +58,16 @@ public class ClassUtils {
             if (simple) {
                 name = getSimpleName(name);
             }
-            if (method){
+            if (method) {
                 name = name + "." + stack.getMethodName();
             }
-            if (lineNumber){
+            if (lineNumber) {
                 name = name + ":" + stack.getLineNumber();
             }
             return name;
         }
         return null;
     }
-
 
 
     /**

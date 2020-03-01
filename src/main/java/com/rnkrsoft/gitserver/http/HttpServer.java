@@ -40,18 +40,18 @@ public class HttpServer extends NanoHTTPD {
 
     protected Response serve(IHTTPSession session) {
         String uri = session.getUri();
-        if (LOGIN.equals(uri)){
+        if (LOGIN.equals(uri)) {
             return login(session);
-        }else if (LOGOUT.equals(uri)){
+        } else if (LOGOUT.equals(uri)) {
             return logout(session);
-        }else if (AJAX.equals(uri)){
+        } else if (AJAX.equals(uri)) {
             return ajax(session);
-        }else{
+        } else {
             return staticResource(session, uri);
         }
     }
 
-    public Response login(IHTTPSession session){
+    public Response login(IHTTPSession session) {
 
         try {
             Map parms = new HashMap();
@@ -69,27 +69,28 @@ public class HttpServer extends NanoHTTPD {
         return Response.newFixedLengthResponse("login success!");
     }
 
-    public Response logout(IHTTPSession session){
+    public Response logout(IHTTPSession session) {
         return Response.newFixedLengthResponse("logout success!");
     }
 
-    public Response ajax(IHTTPSession session){
+    public Response ajax(IHTTPSession session) {
         try {
-           String str =  IOUtils.toString(session.getInputStream(), "UTF-8");
+            String str = IOUtils.toString(session.getInputStream(), "UTF-8");
             System.out.println(str);
         } catch (IOException e) {
             e.printStackTrace();
         }
         return Response.newFixedLengthResponse("ajax success!");
     }
-    public Response staticResource(IHTTPSession session, String uri){
+
+    public Response staticResource(IHTTPSession session, String uri) {
         logger.debug("access:{}", uri);
         String filename = uri.substring(1);
 
         if (uri.equals(REQUEST_ROOT)) {
             filename = "index.html";
         }
-        String suffix = filename.substring(filename.lastIndexOf("." ) + 1);
+        String suffix = filename.substring(filename.lastIndexOf(".") + 1);
         String mimeType = OCTET_STREAM_MIME_TYPE;
         if (suffix != null && !suffix.isEmpty()) {
             String mimeType0 = MIME_TYPES.get(suffix);
@@ -107,8 +108,10 @@ public class HttpServer extends NanoHTTPD {
             return response404(session, uri);
         }
     }
+
     /**
      * 发生内部错误
+     *
      * @param session
      * @param url
      * @return
@@ -123,6 +126,7 @@ public class HttpServer extends NanoHTTPD {
 
     /**
      * 应答文件不存在
+     *
      * @param session
      * @param url
      * @return

@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by rnkrsoft.com on 2017/1/4.
+ * Created by woate on 2017/1/4.
  * 日期字段类型
  */
 @Target({ElementType.FIELD})
@@ -30,21 +30,39 @@ public @interface DateColumn {
 
     /**
      * 默认值使用当前时间戳
+     *
      * @return false
      */
     boolean currentTimestamp() default false;
 
     /**
      * 是否在更新记录的时候自动更新日期
+     *
      * @return false
      */
     boolean onUpdate() default false;
+
     /**
      * 默认值
+     *
      * @return 默认值
      * @since 1.0.0
      */
     String defaultValue() default "";
+
+    /**
+     * 当前字段作为条件，如果不配置条件对象时提供的默认逻辑模式
+     *
+     * @return 逻辑模式
+     */
+    LogicMode logicMode() default LogicMode.AND;
+
+    /**
+     * 当前字段作为条件，如果不配置条件对象时提供的默认值模式
+     *
+     * @return 值模式
+     */
+    ValueMode valueMode() default ValueMode.EQ;
 
     /**
      * 字段数据类型

@@ -40,7 +40,7 @@ public class AjaxResponse<T> implements Serializable {
         return GSON.toJson(this);
     }
 
-    public static class Result{
+    public static class Result {
         String code;
         String desc;
 

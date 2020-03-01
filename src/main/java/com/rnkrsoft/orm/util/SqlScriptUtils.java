@@ -1,17 +1,17 @@
 package com.rnkrsoft.orm.util;
 
-import com.rnkrsoft.orm.annotation.DatabaseType;
-import com.rnkrsoft.util.StringUtils;
 import com.rnkrsoft.interfaces.EnumBase;
 import com.rnkrsoft.interfaces.EnumIntegerCode;
 import com.rnkrsoft.interfaces.EnumStringCode;
-import com.rnkrsoft.orm.SupportedJdbcType;
+import com.rnkrsoft.orm.jdbc.SupportedJdbcType;
+import com.rnkrsoft.orm.annotation.DatabaseType;
 import com.rnkrsoft.orm.annotation.NameMode;
 import com.rnkrsoft.orm.annotation.PrimaryKeyStrategy;
 import com.rnkrsoft.orm.annotation.WordMode;
-import com.rnkrsoft.orm.metadata.ColumnMetadata;
 import com.rnkrsoft.orm.extractor.EntityExtractorHelper;
+import com.rnkrsoft.orm.metadata.ColumnMetadata;
 import com.rnkrsoft.orm.metadata.TableMetadata;
+import com.rnkrsoft.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayOutputStream;
@@ -22,7 +22,7 @@ import java.util.Map;
 
 
 /**
- * Created by rnkrsoft.com on 2018/4/26.
+ * Created by woate on 2018/4/26.
  * 实体工具类，用于从实体类上提取注解，生成封装
  */
 @Slf4j
@@ -112,7 +112,7 @@ public abstract class SqlScriptUtils {
         sql.append(" " + table);
         sql.append("(").append(System.getProperty("line.separator"));
         int autoIncrementCnt = 0;
-        List<String> orderColumns =  tableMetadata.getColumns();
+        List<String> orderColumns = tableMetadata.getColumns();
         for (String name : orderColumns) {
             ColumnMetadata columnMetadata = (ColumnMetadata) tableMetadata.getColumnMetadataSet().get(name);
             sql.append(" ")
@@ -190,30 +190,30 @@ public abstract class SqlScriptUtils {
                 sql.append(convert(" ON UPDATE CURRENT_TIMESTAMP", keywordMode));
             }
             if (columnMetadata.getComment() != null && !columnMetadata.getComment().trim().isEmpty()) {
-               if (tableMetadata.getType() == DatabaseType.Oracle || tableMetadata.getType() == DatabaseType.Sqlite){
-                   sql.append(convert(" COMMENT '", keywordMode)).append(columnMetadata.getComment());
-                   if (columnMetadata.getEnumClass() != null
-                           && columnMetadata.getEnumClass() != EnumBase.class
-                           && columnMetadata.getEnumClass() != EnumStringCode.class
-                           && columnMetadata.getEnumClass() != EnumIntegerCode.class
-                   ) {
-                       if (EnumBase.class.isAssignableFrom(columnMetadata.getEnumClass())) {
-                           if (EnumStringCode.class.isAssignableFrom(columnMetadata.getEnumClass())) {
-                               sql.append(" ");
-                               for (Object val : columnMetadata.getEnumClass().getEnumConstants()) {
-                               }
-                           } else if (EnumIntegerCode.class.isAssignableFrom(columnMetadata.getEnumClass())) {
-                               sql.append(" ");
-                               for (Object val : columnMetadata.getEnumClass().getEnumConstants()) {
+                if (tableMetadata.getType() == DatabaseType.Oracle || tableMetadata.getType() == DatabaseType.Sqlite) {
+                    sql.append(convert(" COMMENT '", keywordMode)).append(columnMetadata.getComment());
+                    if (columnMetadata.getEnumClass() != null
+                            && columnMetadata.getEnumClass() != EnumBase.class
+                            && columnMetadata.getEnumClass() != EnumStringCode.class
+                            && columnMetadata.getEnumClass() != EnumIntegerCode.class
+                    ) {
+                        if (EnumBase.class.isAssignableFrom(columnMetadata.getEnumClass())) {
+                            if (EnumStringCode.class.isAssignableFrom(columnMetadata.getEnumClass())) {
+                                sql.append(" ");
+                                for (Object val : columnMetadata.getEnumClass().getEnumConstants()) {
+                                }
+                            } else if (EnumIntegerCode.class.isAssignableFrom(columnMetadata.getEnumClass())) {
+                                sql.append(" ");
+                                for (Object val : columnMetadata.getEnumClass().getEnumConstants()) {
 
-                               }
-                           } else {
+                                }
+                            } else {
 
-                           }
-                       }
-                   }
-                   sql.append("'");
-               }
+                            }
+                        }
+                    }
+                    sql.append("'");
+                }
             }
             sql.append(",").append(System.getProperty("line.separator"));
         }
@@ -229,7 +229,7 @@ public abstract class SqlScriptUtils {
         }
         //如果实体类上有注解
         if (!StringUtils.isBlank(tableMetadata.getComment())) {
-            if (tableMetadata.getType() == DatabaseType.Oracle){
+            if (tableMetadata.getType() == DatabaseType.Oracle) {
                 sql.append(convert("COMMENT = '", keywordMode) + tableMetadata.getComment() + "'");
             }
         }
@@ -364,7 +364,7 @@ public abstract class SqlScriptUtils {
         StringBuilder builder = new StringBuilder();
         int index = 0;
         Map<String, ColumnMetadata> fields = tableMetadata.getColumnMetadataSet();
-        List<String> orderColumns =  tableMetadata.getColumns();
+        List<String> orderColumns = tableMetadata.getColumns();
         for (String name : orderColumns) {
             ColumnMetadata columnMetadata = fields.get(name);
             index++;

@@ -1,4 +1,4 @@
-package com.rnkrsoft.orm;
+package com.rnkrsoft.orm.entity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 分页对象
  * Created by woate on 2020/02/28.
+ * 分页对象
  */
-public class Pagination<T> {
+public final class Pagination<T> {
     /**
      * 总条数
      */
@@ -49,7 +49,7 @@ public class Pagination<T> {
     }
 
     public Pagination(int pageSize, int curPageNo) {
-        this(pageSize, curPageNo, (T)null);
+        this(pageSize, curPageNo, (T) null);
     }
 
     public Pagination(int pageSize, int curPageNo, int total) {
@@ -64,12 +64,13 @@ public class Pagination<T> {
 
     /**
      * 进行逻辑分页
-     * @param pageSize 分页大小
+     *
+     * @param pageSize  分页大小
      * @param curPageNo 当前页
-     * @param data 数据
+     * @param data      数据
      */
     public Pagination(int pageSize, int curPageNo, List<T> data) {
-        this(pageSize, curPageNo, (T)null);
+        this(pageSize, curPageNo, (T) null);
         setTotal(data.size());
         List<T> result = new ArrayList();
         int offset = (curPageNo - 1) * pageSize;
@@ -83,31 +84,32 @@ public class Pagination<T> {
 
     /**
      * 如果超过最大页数，则重设总条数
+     *
      * @param total
      */
     public void ifOverPageNumResetCurPageNoAndTotal(int total) {
         this.total = total;
         //如果超过最大页数，则重设总条数
-        if(total == 0){
+        if (total == 0) {
             curPageNo = 1;
-        }else if (((total - 1) / pageSize) + 1 < curPageNo) {
-            curPageNo = ((total - 1) / pageSize) + 1 ;
+        } else if (((total - 1) / pageSize) + 1 < curPageNo) {
+            curPageNo = ((total - 1) / pageSize) + 1;
         }
-        this.pageNum = (total + pageSize -1 ) / pageSize;
+        this.pageNum = (total + pageSize - 1) / pageSize;
     }
 
     public void setTotal(int total) {
         this.total = total;
         //如果设置了总条数，不执行统计
-        if(total > 0){
+        if (total > 0) {
             //如果传入的总条数超过了分页大小乘以总页数，则使用统计
             if (((total - 1) / pageSize) + 1 < curPageNo) {
                 statsTotal = true;
-            }else{
-                this.pageNum = (total + pageSize -1 ) / pageSize;
+            } else {
+                this.pageNum = (total + pageSize - 1) / pageSize;
                 statsTotal = false;
             }
-        }else{
+        } else {
             statsTotal = true;
         }
     }
@@ -124,7 +126,7 @@ public class Pagination<T> {
         return pageNum;
     }
 
-    public int getSkipRecordNum(){
+    public int getSkipRecordNum() {
         return this.pageSize * (this.getCurPageNo() - 1);
     }
 

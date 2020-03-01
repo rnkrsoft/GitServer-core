@@ -1,7 +1,7 @@
 package com.rnkrsoft.logtrace;
 
 /**
- * Created by rnkrsoft.com on 2017/1/6.
+ * Created by woate on 2017/1/6.
  * 日志跟踪异常
  */
 public class TraceableException extends Exception {

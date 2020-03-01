@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+
 @Getter
 @Setter
 public class QueryUsersResponse {
@@ -15,7 +16,7 @@ public class QueryUsersResponse {
 
     @Getter
     @AllArgsConstructor
-    static class Record{
+    static class Record {
         String username;
         String email;
         String valid;

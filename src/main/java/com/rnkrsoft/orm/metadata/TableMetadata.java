@@ -1,9 +1,11 @@
 package com.rnkrsoft.orm.metadata;
 
-import com.rnkrsoft.orm.JdbcStatementType;
 import com.rnkrsoft.orm.annotation.DatabaseType;
 import com.rnkrsoft.util.StringUtils;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -13,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Created by woate on 2020/3/1.
  * 表元信息
  */
 @EqualsAndHashCode
@@ -95,7 +98,7 @@ public class TableMetadata<T> {
         columnMetadataSet.put(columnMetadata.getJdbcName(), columnMetadata);
         if (columnMetadata.isPrimaryKey()) {
             primaryKeyColumnNameList.add(columnMetadata.getJdbcName());
-        }else {
+        } else {
             nonPrimaryKeyColumnNameList.add(columnMetadata.getJdbcName());
         }
         return this;
@@ -170,6 +173,7 @@ public class TableMetadata<T> {
 
     /**
      * 获取非主键字段名
+     *
      * @return
      */
     public List<String> getNonPrimaryKeyColumnNameList() {
@@ -178,6 +182,7 @@ public class TableMetadata<T> {
 
     /**
      * 获取主键字段列表
+     *
      * @return
      */
     public List<String> getPrimaryKeyColumnNameList() {
@@ -186,11 +191,12 @@ public class TableMetadata<T> {
 
     /**
      * 获取主键字段元信息列表
+     *
      * @return
      */
-    public List<ColumnMetadata> getPrimaryKeyColumns(){
+    public List<ColumnMetadata> getPrimaryKeyColumns() {
         List<ColumnMetadata> list = new ArrayList<ColumnMetadata>();
-        for(String name : primaryKeyColumnNameList){
+        for (String name : primaryKeyColumnNameList) {
             list.add(getColumn(name));
         }
         return list;
@@ -198,6 +204,7 @@ public class TableMetadata<T> {
 
     /**
      * 获取所有字段名，包括主键字段
+     *
      * @return
      */
     public List<String> getColumns() {

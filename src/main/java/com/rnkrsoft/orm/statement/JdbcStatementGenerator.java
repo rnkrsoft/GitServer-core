@@ -1,15 +1,18 @@
-package com.rnkrsoft.orm.generator;
+package com.rnkrsoft.orm.statement;
 
-import com.rnkrsoft.orm.JdbcStatementType;
-import com.rnkrsoft.orm.Pagination;
+import com.rnkrsoft.orm.entity.Pagination;
+import com.rnkrsoft.orm.annotation.LogicMode;
+import com.rnkrsoft.orm.annotation.ValueMode;
+import com.rnkrsoft.orm.condition.JdbcCondition;
 import com.rnkrsoft.orm.metadata.ColumnMetadata;
 import com.rnkrsoft.orm.metadata.TableMetadata;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
+/**
+ * Created by woate on 2020/3/1.
+ * 执行语句生成器，用于将表元数据和语句类型结合生成带有占位符的SQL语句，借助JDBC预编译机制去执行
+ */
 public class JdbcStatementGenerator {
 
     public static void placeholderSql(JdbcStatement statement) {
@@ -112,6 +115,7 @@ public class JdbcStatementGenerator {
         ColumnMetadata[] nonNullColumns = statement.getNonNullColumns();
         StringBuilder buffer = new StringBuilder(1024);
         buffer.append("delete from ").append(tableMetadata.getTableName());
+        JdbcCondition conditionOverride = statement.condition;
         int columnLength = nonNullColumns.length;
         if (columnLength > 0) {
             buffer.append(" where");
@@ -120,9 +124,9 @@ public class JdbcStatementGenerator {
             ColumnMetadata column = nonNullColumns[i];
             buffer.append(" ");
             if (i > 0) {
-                buffer.append(column.getLogicMode().getCode());
+                buffer.append(logicMode(column, conditionOverride).getCode());
             }
-            buffer.append(" ").append(column.getJdbcName()).append(" ").append(column.getValueMode().getCode()).append(" ?");
+            buffer.append(" ").append(column.getJdbcName()).append(" ").append(valueMode(column, conditionOverride).getCode()).append(" ?");
             statement.getColumns().add(column);
         }
         statement.setPlaceholderSql(buffer.toString());
@@ -198,6 +202,7 @@ public class JdbcStatementGenerator {
         TableMetadata tableMetadata = statement.getTableMetadata();
         ColumnMetadata[] nonNullColumns = statement.getNonNullColumns();
         Collection<ColumnMetadata> columnMetadataSet = tableMetadata.getColumnMetadataSet().values();
+        JdbcCondition conditionOverride = statement.condition;
         StringBuilder buffer = new StringBuilder(1024);
         buffer.append("select");
         int count = 0;
@@ -214,9 +219,9 @@ public class JdbcStatementGenerator {
             for (int i = 0; i < nonNullColumns.length; i++) {
                 ColumnMetadata columnMetadata = nonNullColumns[i];
                 if (i > 0) {
-                    buffer.append(" ").append(columnMetadata.getLogicMode().getCode());
+                    buffer.append(" ").append(logicMode(columnMetadata, conditionOverride).getCode());
                 }
-                buffer.append(" ").append(columnMetadata.getJdbcName()).append(" ").append(columnMetadata.getValueMode().getCode()).append(" ?");
+                buffer.append(" ").append(columnMetadata.getJdbcName()).append(" ").append(valueMode(columnMetadata, conditionOverride).getCode()).append(" ?");
                 statement.getColumns().add(columnMetadata);
             }
         }
@@ -227,6 +232,7 @@ public class JdbcStatementGenerator {
         TableMetadata tableMetadata = statement.getTableMetadata();
         ColumnMetadata[] nonNullColumns = statement.getNonNullColumns();
         Collection<ColumnMetadata> columnMetadataSet = tableMetadata.getColumnMetadataSet().values();
+        JdbcCondition conditionOverride = statement.condition;
         StringBuilder buffer = new StringBuilder(1024);
         buffer.append("select count(1)");
         buffer.append(" from ").append(tableMetadata.getTableName());
@@ -235,9 +241,9 @@ public class JdbcStatementGenerator {
             for (int i = 0; i < nonNullColumns.length; i++) {
                 ColumnMetadata columnMetadata = nonNullColumns[i];
                 if (i > 0) {
-                    buffer.append(" ").append(columnMetadata.getLogicMode().getCode());
+                    buffer.append(" ").append(logicMode(columnMetadata, conditionOverride).getCode());
                 }
-                buffer.append(" ").append(columnMetadata.getJdbcName()).append(" ").append(columnMetadata.getValueMode().getCode()).append(" ?");
+                buffer.append(" ").append(columnMetadata.getJdbcName()).append(" ").append(valueMode(columnMetadata, conditionOverride).getCode()).append(" ?");
                 statement.getColumns().add(columnMetadata);
             }
         }
@@ -249,6 +255,7 @@ public class JdbcStatementGenerator {
         TableMetadata tableMetadata = statement.getTableMetadata();
         ColumnMetadata[] nonNullColumns = statement.getNonNullColumns();
         Collection<ColumnMetadata> columnMetadataSet = tableMetadata.getColumnMetadataSet().values();
+        JdbcCondition conditionOverride = statement.condition;
         StringBuilder buffer = new StringBuilder(1024);
         buffer.append("select");
         int count = 0;
@@ -265,13 +272,32 @@ public class JdbcStatementGenerator {
             for (int i = 0; i < nonNullColumns.length; i++) {
                 ColumnMetadata columnMetadata = nonNullColumns[i];
                 if (i > 0) {
-                    buffer.append(" ").append(columnMetadata.getLogicMode().getCode());
+                    buffer.append(" ").append(logicMode(columnMetadata, conditionOverride).getCode());
                 }
-                buffer.append(" ").append(columnMetadata.getJdbcName()).append(" ").append(columnMetadata.getValueMode().getCode()).append(" ?");
+                buffer.append(" ").append(columnMetadata.getJdbcName()).append(" ").append(valueMode(columnMetadata, conditionOverride).getCode()).append(" ?");
                 statement.getColumns().add(columnMetadata);
             }
         }
         buffer.append(" limit ").append(pagination.getPageSize()).append(" offset ").append(pagination.getSkipRecordNum());
         statement.setPlaceholderSql(buffer.toString());
+    }
+
+
+    static ValueMode valueMode(ColumnMetadata columnMetadata, JdbcCondition condition) {
+        if (condition == null) {
+            return columnMetadata.getValueMode();
+        } else {
+            JdbcCondition.JdbcConditionItem conditionItem = condition.item(columnMetadata.getJdbcName());
+            return conditionItem == null ? columnMetadata.getValueMode() : conditionItem.getValueMode();
+        }
+    }
+
+    static LogicMode logicMode(ColumnMetadata columnMetadata, JdbcCondition condition) {
+        if (condition == null) {
+            return columnMetadata.getLogicMode();
+        } else {
+            JdbcCondition.JdbcConditionItem conditionItem = condition.item(columnMetadata.getJdbcName());
+            return conditionItem == null ? columnMetadata.getLogicMode() : conditionItem.getLogicMode();
+        }
     }
 }

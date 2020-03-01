@@ -6,11 +6,13 @@ import com.rnkrsoft.interfaces.EnumStringCode;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.lang.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Created by rnkrsoft.com on 2017/1/6.
+ * Created by woate on 2017/1/6.
  */
 public class SimpleErrorContext implements ErrorContext {
     ErrorContext stored;
@@ -66,17 +68,17 @@ public class SimpleErrorContext implements ErrorContext {
     }
 
     public ErrorContext code(EnumBase code) {
-        if(code instanceof EnumStringCode){
-            EnumStringCode stringCode = (EnumStringCode)code;
+        if (code instanceof EnumStringCode) {
+            EnumStringCode stringCode = (EnumStringCode) code;
             this.code = stringCode.getCode();
             this.desc = stringCode.getDesc();
             return this;
-        }else if(code instanceof EnumIntegerCode){
-            EnumIntegerCode stringCode = (EnumIntegerCode)code;
+        } else if (code instanceof EnumIntegerCode) {
+            EnumIntegerCode stringCode = (EnumIntegerCode) code;
             this.code = Integer.toString(stringCode.getCode());
             this.desc = stringCode.getDesc();
             return this;
-        }else {
+        } else {
             this.desc = code.getDesc();
             return this;
         }
@@ -159,7 +161,7 @@ public class SimpleErrorContext implements ErrorContext {
         return this;
     }
 
-    public Throwable getCause(){
+    public Throwable getCause() {
         return this.cause;
     }
 
@@ -215,11 +217,11 @@ public class SimpleErrorContext implements ErrorContext {
             builder.append(LINE_SEPARATOR)
                     .append("### subErrors: ");
             for (Error subError : this.subErrors.values()) {
-                    builder.append(LINE_SEPARATOR)
-                            .append("\t")
-                            .append(subError.getCode())
-                            .append(":")
-                            .append(subError.getDesc());
+                builder.append(LINE_SEPARATOR)
+                        .append("\t")
+                        .append(subError.getCode())
+                        .append(":")
+                        .append(subError.getDesc());
             }
 
         }

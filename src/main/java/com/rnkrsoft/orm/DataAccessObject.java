@@ -2,20 +2,28 @@ package com.rnkrsoft.orm;
 
 import com.rnkrsoft.orm.annotation.NameMode;
 import com.rnkrsoft.orm.annotation.WordMode;
-import com.rnkrsoft.orm.generator.JdbcStatement;
+import com.rnkrsoft.orm.condition.JdbcCondition;
+import com.rnkrsoft.orm.entity.Pagination;
+import com.rnkrsoft.orm.jdbc.SupportedJdbcType;
+import com.rnkrsoft.orm.jdbc.executor.JdbcExecutor;
 import com.rnkrsoft.orm.metadata.ColumnMetadata;
 import com.rnkrsoft.orm.metadata.TableMetadata;
+import com.rnkrsoft.orm.statement.JdbcStatement;
+import com.rnkrsoft.orm.statement.JdbcStatementHelper;
+import com.rnkrsoft.orm.statement.JdbcStatementType;
 import com.rnkrsoft.orm.util.SqlScriptUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
 /**
  * Orm 数据访问对象
  * Created by woate on 2020/02/24.
  */
 public class DataAccessObject<T> {
     Orm orm;
+    JdbcExecutor jdbcExecutor;
     TableMetadata tableMetadata;
     /**
      * 一个用于将结果转换成JavaBean的行映射器
@@ -62,19 +70,21 @@ public class DataAccessObject<T> {
         }
     };
 
-    public DataAccessObject(Orm orm, TableMetadata tableMetadata) {
+    public DataAccessObject(Orm orm, JdbcExecutor jdbcExecutor, TableMetadata tableMetadata) {
         this.orm = orm;
+        this.jdbcExecutor = jdbcExecutor;
         this.tableMetadata = tableMetadata;
     }
 
     /**
      * 创建一个实体类对应的表
+     *
      * @return 返回影响记录条数应该总为1，执行失败抛出异常
      */
-    public int createTable(){
+    public int createTable() {
         String sql = SqlScriptUtils.generateCreateTable(tableMetadata.getEntityClass(), NameMode.auto, null, NameMode.auto, null, NameMode.auto, null, null, WordMode.lowerCase, WordMode.lowerCase, false);
         try {
-            return this.orm.executeUpdate(sql);
+            return this.jdbcExecutor.executeUpdate(sql);
         } catch (SQLException e) {
             throw new RuntimeException("insert happens error!", e);
         }
@@ -82,12 +92,13 @@ public class DataAccessObject<T> {
 
     /**
      * 删除一个实体类对应的表
-     *  @return 返回影响记录条数应该总为1，执行失败抛出异常
+     *
+     * @return 返回影响记录条数应该总为1，执行失败抛出异常
      */
-    public int dropTable(){
+    public int dropTable() {
         String sql = SqlScriptUtils.generateDropTable(tableMetadata.getEntityClass(), NameMode.auto, null, NameMode.auto, null, NameMode.auto, null, WordMode.lowerCase, WordMode.lowerCase, false);
         try {
-            return this.orm.executeUpdate(sql);
+            return this.jdbcExecutor.executeUpdate(sql);
         } catch (SQLException e) {
             throw new RuntimeException("insert happens error!", e);
         }
@@ -95,28 +106,31 @@ public class DataAccessObject<T> {
 
     /**
      * 将一个实体记录插入到数据库
+     *
      * @param entity 实体类
      * @return 影响条数应该为1，如果插入失败返回0或者抛出异常
      * @see #insertSelective(Object)
      */
     public int insert(T entity) {
-        JdbcStatement statement = this.orm.entityExtractorHelper.dynamic(tableMetadata, JdbcStatementType.INSERT, entity);
+        JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.INSERT, null, entity);
         try {
-            return this.orm.executeUpdate(statement);
+            return this.jdbcExecutor.executeUpdate(statement);
         } catch (SQLException e) {
             throw new RuntimeException("insert happens error!", e);
         }
     }
+
     /**
      * 将一个实体记录非null的字段值插入到数据库
+     *
      * @param entity 实体类
      * @return 影响条数应该为1，如果插入失败返回0或者抛出异常
      * @see #insert(Object)
      */
     public int insertSelective(T entity) {
-        JdbcStatement statement = this.orm.entityExtractorHelper.dynamic(tableMetadata, JdbcStatementType.INSERT_SELECTIVE, entity);
+        JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.INSERT_SELECTIVE, null, entity);
         try {
-            return this.orm.executeUpdate(statement);
+            return this.jdbcExecutor.executeUpdate(statement);
         } catch (SQLException e) {
             throw new RuntimeException("insertSelective happens error!", e);
         }
@@ -124,14 +138,15 @@ public class DataAccessObject<T> {
 
     /**
      * 更新一个拥有主键值的实体中所有字段的值到数据库
+     *
      * @param entity 实体类
      * @return 影响条数应该为1，如果插入失败返回0或者抛出异常
      * @see #updateByPrimaryKeySelective(Object)
      */
     public int updateByPrimaryKey(T entity) {
-        JdbcStatement statement = this.orm.entityExtractorHelper.dynamic(tableMetadata, JdbcStatementType.UPDATE_PRIMARY_KEY, entity);
+        JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.UPDATE_PRIMARY_KEY, null, entity);
         try {
-            return this.orm.executeUpdate(statement);
+            return this.jdbcExecutor.executeUpdate(statement);
         } catch (SQLException e) {
             throw new RuntimeException("updateByPrimaryKey happens error!", e);
         }
@@ -139,14 +154,15 @@ public class DataAccessObject<T> {
 
     /**
      * 更新一个拥有主键值的实体中非null字段的值到数据库
+     *
      * @param entity 实体类
      * @return 影响条数应该为1，如果插入失败返回0或者抛出异常
      * @see #updateByPrimaryKey(Object)
      */
     public int updateByPrimaryKeySelective(T entity) {
-        JdbcStatement statement = this.orm.entityExtractorHelper.dynamic(tableMetadata, JdbcStatementType.UPDATE_PRIMARY_KEY_SELECTIVE, entity);
+        JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.UPDATE_PRIMARY_KEY_SELECTIVE, null, entity);
         try {
-            return this.orm.executeUpdate(statement);
+            return this.jdbcExecutor.executeUpdate(statement);
         } catch (SQLException e) {
             throw new RuntimeException("updateByPrimaryKeySelective happens error!", e);
         }
@@ -154,13 +170,14 @@ public class DataAccessObject<T> {
 
     /**
      * 删除一个拥有主键值的实体的记录，其他字段即使有值也不参与条件
+     *
      * @param entity 实体类
      * @return 影响条数应该为1，如果插入失败返回0或者抛出异常
      */
     public int deleteByPrimaryKey(T entity) {
-        JdbcStatement statement = this.orm.entityExtractorHelper.dynamic(tableMetadata, JdbcStatementType.DELETE_PRIMARY_KEY, entity);
+        JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.DELETE_PRIMARY_KEY, null, entity);
         try {
-            return this.orm.executeUpdate(statement);
+            return this.jdbcExecutor.executeUpdate(statement);
         } catch (SQLException e) {
             throw new RuntimeException("deleteByPrimaryKey happens error!", e);
         }
@@ -168,16 +185,18 @@ public class DataAccessObject<T> {
 
     /**
      * 统计一个满足实体中非null字段的值记录条数
-     * @param entity 实体类
+     *
+     * @param entity    实体类
+     * @param condition 条件对象
      * @return 影响条数应该为1，如果插入失败返回0或者抛出异常
      */
-    public int countSelective(T entity) {
-        final JdbcStatement statement = this.orm.entityExtractorHelper.dynamic(tableMetadata, JdbcStatementType.COUNT_SELECTIVE, entity);
+    public int countSelective(T entity, JdbcCondition condition) {
+        final JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.COUNT_SELECTIVE, condition, entity);
         try {
-            return this.orm.executeQueryOne(statement, new Orm.RowMapper<Integer>() {
+            return this.jdbcExecutor.executeQueryFirst(statement, new Orm.RowMapper<Integer>() {
                 @Override
                 public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
-                   return  rs.getInt(1);
+                    return rs.getInt(1);
                 }
             });
         } catch (SQLException e) {
@@ -187,13 +206,15 @@ public class DataAccessObject<T> {
 
     /**
      * 查询一个满足实体中非null字段的值的所有记录
-     * @param entity 实体类
+     *
+     * @param entity    实体类
+     * @param condition 条件对象
      * @return 记录列表，无结果时返回空list
      */
-    public List<T> selectSelective(T entity) {
-        final JdbcStatement statement = this.orm.entityExtractorHelper.dynamic(tableMetadata, JdbcStatementType.SELECT_SELECTIVE, entity);
+    public List<T> selectSelective(T entity, JdbcCondition condition) {
+        final JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.SELECT_SELECTIVE, condition, entity);
         try {
-            return this.orm.executeQuery(statement, JAVABEAN_ROW_MAPPER);
+            return this.jdbcExecutor.executeQuery(statement, JAVABEAN_ROW_MAPPER);
         } catch (SQLException e) {
             throw new RuntimeException("selectSelective happens error!", e);
         }
@@ -201,13 +222,14 @@ public class DataAccessObject<T> {
 
     /**
      * 按照一个实体的物理主键字段查询记录
+     *
      * @param entity 实体类
      * @return 如果存在记录则返回对象否则返回null
      */
     public T selectByPrimaryKey(T entity) {
-        final JdbcStatement statement = this.orm.entityExtractorHelper.dynamic(tableMetadata, JdbcStatementType.SELECT_SELECTIVE, entity);
+        final JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.SELECT_PRIMARY_KEY, null, entity);
         try {
-            List<T> result = this.orm.executeQuery(statement, JAVABEAN_ROW_MAPPER);
+            List<T> result = this.jdbcExecutor.executeQuery(statement, JAVABEAN_ROW_MAPPER);
             int size = result.size();
             if (size == 0) {
                 return null;
@@ -223,15 +245,17 @@ public class DataAccessObject<T> {
 
     /**
      * 根据分页对象进行分页查询满足条件非null字段的记录，并统计总条数
+     *
      * @param pagination 分页对象
+     * @param condition  条件对象
      * @return 分页对象
      */
-    public Pagination<T> querySelective(Pagination<T> pagination) {
-        JdbcStatement countStatement = this.orm.entityExtractorHelper.dynamic(tableMetadata, JdbcStatementType.COUNT_SELECTIVE, pagination);
+    public Pagination<T> querySelective(Pagination<T> pagination, JdbcCondition condition) {
+        JdbcStatement countStatement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.COUNT_SELECTIVE, condition, pagination);
         //1.构建统计记录的sql语句，并执行
         Integer total = null;
         try {
-            total = this.orm.executeQueryOne(countStatement, new Orm.RowMapper<Integer>() {
+            total = this.jdbcExecutor.executeQueryFirst(countStatement, new Orm.RowMapper<Integer>() {
                 @Override
                 public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
                     return rs.getInt(1);
@@ -242,9 +266,9 @@ public class DataAccessObject<T> {
         }
         //2.构建查询记录的sql语句，并执行
         List<T> records = null;
-        JdbcStatement selectStatement = this.orm.entityExtractorHelper.dynamic(tableMetadata, JdbcStatementType.PAGINATION_SELECT_SELECTIVE, pagination);
+        JdbcStatement selectStatement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.PAGINATION_SELECT_SELECTIVE, condition, pagination);
         try {
-            records = this.orm.executeQuery(selectStatement, JAVABEAN_ROW_MAPPER);
+            records = this.jdbcExecutor.executeQuery(selectStatement, JAVABEAN_ROW_MAPPER);
         } catch (SQLException e) {
             throw new RuntimeException("query happens error!", e);
         }

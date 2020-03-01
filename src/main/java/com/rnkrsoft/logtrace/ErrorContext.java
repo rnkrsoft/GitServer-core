@@ -8,7 +8,7 @@ import com.rnkrsoft.interfaces.EnumStringCode;
 import java.util.List;
 
 /**
- * Created by rnkrsoft.com on 2017/1/6.
+ * Created by woate on 2017/1/6.
  * 错误上下文
  */
 public interface ErrorContext extends Error {

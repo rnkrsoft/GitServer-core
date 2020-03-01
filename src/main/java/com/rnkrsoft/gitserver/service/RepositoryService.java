@@ -1,15 +1,14 @@
 package com.rnkrsoft.gitserver.service;
 
-import com.rnkrsoft.gitserver.entity.RepositoryEntity;
 import com.rnkrsoft.gitserver.exception.RepositoryCreateFailureException;
 import com.rnkrsoft.gitserver.exception.UninitializedGitServerException;
 import com.rnkrsoft.gitserver.service.domain.QueryRepositoryRequest;
 import com.rnkrsoft.gitserver.service.domain.QueryRepositoryResponse;
-import com.rnkrsoft.orm.Pagination;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.errors.RepositoryNotFoundException;
 
 import java.util.List;
+
 /**
  * 仓库服务
  * Created by woate on 2020/02/24.
@@ -20,7 +19,7 @@ public interface RepositoryService {
      * 创建一个git仓库
      *
      * @param repositoryName 仓库名称
-     * @param owner 拥有者
+     * @param owner          拥有者
      * @throws RepositoryCreateFailureException 创建失败时抛出异常
      */
     void createRepository(String repositoryName, String owner) throws RepositoryCreateFailureException, UninitializedGitServerException;
@@ -53,11 +52,14 @@ public interface RepositoryService {
 
     /**
      * 列出所有仓库的名字
+     *
      * @return 仓库名称列表
      */
     List<String> listRepositoriesName();
+
     /**
      * 分页查询仓库
+     *
      * @return 分页结果对象
      */
     QueryRepositoryResponse queryRepository(QueryRepositoryRequest request);

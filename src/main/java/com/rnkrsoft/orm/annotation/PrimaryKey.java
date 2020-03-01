@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by rnkrsoft.com on 2017/1/4.
+ * Created by woate on 2017/1/4.
  * 标注该注解的字段是主键，支持多个主键，但是数据访问对象只支持一个物理主键
  */
 @Target({ElementType.FIELD})
@@ -31,8 +31,9 @@ public @interface PrimaryKey {
      * <li>固定字符串</li>
      * <li>复杂表达式 ${yyyyMMddHHmmssSSS}_${SEQ:5}_${RANDOM:8}</li>
      * </ol>
-     * @see PrimaryKeyFeatureConstant
+     *
      * @return 主键特征
+     * @see PrimaryKeyFeatureConstant
      * @since 1.0.0
      */
     String feature() default "";

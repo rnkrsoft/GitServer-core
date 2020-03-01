@@ -1,7 +1,7 @@
 package com.rnkrsoft.orm.extractor;
 
 import com.rnkrsoft.logtrace.ErrorContextFactory;
-import com.rnkrsoft.orm.SupportedJdbcType;
+import com.rnkrsoft.orm.jdbc.SupportedJdbcType;
 import com.rnkrsoft.orm.annotation.*;
 import com.rnkrsoft.orm.metadata.ColumnMetadata;
 import com.rnkrsoft.orm.metadata.TableMetadata;
@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 
 /**
- * Created by rnkrsoft.com on 2017/1/7.
+ * Created by woate on 2020/3/1.
  * 提取标注ORM注解的实体类
  */
 @Slf4j
@@ -87,6 +87,9 @@ public class OrmEntityExtractor implements EntityExtractor {
         if (dataType != null) {
             columnMetadata.setFullJdbcType(dataType);
         }
+        columnMetadata.setLogicMode(stringColumn.logicMode());
+        columnMetadata.setValueMode(stringColumn.valueMode());
+        ErrorContextFactory.instance().activity(null);
         return this;
     }
 
@@ -106,7 +109,7 @@ public class OrmEntityExtractor implements EntityExtractor {
                 && fieldClass != Integer.TYPE
                 && fieldClass != Boolean.class
                 && fieldClass != Boolean.TYPE
-                ) {
+        ) {
             throw ErrorContextFactory.instance()
                     .activity("提取实体类{}的元信息", columnMetadata.getEntityClass())
                     .message("字段{}数据类型和注解类型支持的映射数据不一致", columnMetadata.getJavaName())
@@ -285,7 +288,9 @@ public class OrmEntityExtractor implements EntityExtractor {
         if (dataType != null) {
             columnMetadata.setFullJdbcType(dataType);
         }
-
+        columnMetadata.setLogicMode(numberColumn.logicMode());
+        columnMetadata.setValueMode(numberColumn.valueMode());
+        ErrorContextFactory.instance().activity(null);
         return this;
     }
 
@@ -402,6 +407,8 @@ public class OrmEntityExtractor implements EntityExtractor {
                         .runtimeException();
             }
         }
+        columnMetadata.setLogicMode(dateColumn.logicMode());
+        columnMetadata.setValueMode(dateColumn.valueMode());
         ErrorContextFactory.instance().activity(null);
         return this;
     }
@@ -431,7 +438,7 @@ public class OrmEntityExtractor implements EntityExtractor {
                     && columnMetadata.getJavaType() != Integer.TYPE
                     && columnMetadata.getJavaType() != Long.class
                     && columnMetadata.getJavaType() != Long.TYPE
-                    ) {
+            ) {
                 throw ErrorContextFactory.instance()
                         .activity("提取实体类{}的元信息", columnMetadata.getEntityClass())
                         .message("字段{}使用了自增主键，类型必须为整数", field.getName())

@@ -1,8 +1,8 @@
 package com.rnkrsoft.gitserver.service.impl.sqlite;
 
 import com.rnkrsoft.gitserver.entity.RoleEntity;
-import com.rnkrsoft.orm.Pagination;
 import com.rnkrsoft.gitserver.service.RoleService;
+import com.rnkrsoft.orm.entity.Pagination;
 
 import java.util.List;
 

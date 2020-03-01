@@ -13,7 +13,7 @@ public class QueryRepositoryResponse {
 
     @Getter
     @AllArgsConstructor
-    static class Record{
+    static class Record {
         String repositoryName;
         String repositoryDesc;
         String createDate;

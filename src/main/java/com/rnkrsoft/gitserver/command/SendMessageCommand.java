@@ -1,69 +1,69 @@
 package com.rnkrsoft.gitserver.command;
 
-import java.io.IOException;
-
 import org.apache.sshd.server.Environment;
 import org.eclipse.jgit.lib.Constants;
+
+import java.io.IOException;
 
 /**
  * Created by woate on 2020/02/24.
  */
 public class SendMessageCommand extends BaseCommand {
-	
-	private String message;
-	private int exitCode = CommandConstants.CODE_OK;
-	
-	public SendMessageCommand() {
-	}
-	
-	public SendMessageCommand(String message, int exitCode) {
-		this.message = message;
-		this.exitCode = exitCode;
-	}
 
-	public void start(final Environment env) throws IOException {
-		String message;
-		message = getMessage(env.getEnv().get(Environment.ENV_USER));
-		err.write(Constants.encodeASCII(message.toString()));
-		err.flush();
+    private String message;
+    private int exitCode = CommandConstants.CODE_OK;
 
-		in.close();
-		out.close();
-		err.close();
-		onExit(exitCode);
-	}
+    public SendMessageCommand() {
+    }
 
-	private String getMessage(String user) {
-		if(message != null && !"".equals(message)) {
-			return message;
-		}
-		
-		StringBuilder msg = new StringBuilder();
+    public SendMessageCommand(String message, int exitCode) {
+        this.message = message;
+        this.exitCode = exitCode;
+    }
 
-		msg.append("\r\n");
-		msg.append("  ****    Welcome to use the Git Server   ****\r\n");
-		msg.append("\r\n");
+    public void start(final Environment env) throws IOException {
+        String message;
+        message = getMessage(env.getEnv().get(Environment.ENV_USER));
+        err.write(Constants.encodeASCII(message.toString()));
+        err.flush();
 
-		msg.append(user).append(", you have successfully connected over SSH.");
-		msg.append("\r\n");
-		msg.append("\r\n");
+        in.close();
+        out.close();
+        err.close();
+        onExit(exitCode);
+    }
 
-		msg.append("  Unfortunately, interactive shells are disabled.\r\n");
-		msg.append("  To clone a hosted Git repository, use:\r\n");
-		msg.append("\r\n");
+    private String getMessage(String user) {
+        if (message != null && !"".equals(message)) {
+            return message;
+        }
 
-		msg.append("  git clone ssh://");
-		msg.append(user);
-		msg.append("@<HOST>");
-		msg.append("/");
-		msg.append("<REPOSITORY_NAME>.git");
-		msg.append("\r\n");
+        StringBuilder msg = new StringBuilder();
 
-		msg.append("\r\n");
-		
-		return msg.toString();
-	}
+        msg.append("\r\n");
+        msg.append("  ****    Welcome to use the Git Server   ****\r\n");
+        msg.append("\r\n");
 
-	public void destroy() {
-	}
+        msg.append(user).append(", you have successfully connected over SSH.");
+        msg.append("\r\n");
+        msg.append("\r\n");
+
+        msg.append("  Unfortunately, interactive shells are disabled.\r\n");
+        msg.append("  To clone a hosted Git repository, use:\r\n");
+        msg.append("\r\n");
+
+        msg.append("  git clone ssh://");
+        msg.append(user);
+        msg.append("@<HOST>");
+        msg.append("/");
+        msg.append("<REPOSITORY_NAME>.git");
+        msg.append("\r\n");
+
+        msg.append("\r\n");
+
+        return msg.toString();
+    }
+
+    public void destroy() {
+    }
 }

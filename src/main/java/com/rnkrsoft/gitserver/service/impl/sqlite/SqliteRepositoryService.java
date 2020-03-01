@@ -1,15 +1,13 @@
 package com.rnkrsoft.gitserver.service.impl.sqlite;
 
 import com.rnkrsoft.gitserver.GitServer;
-import com.rnkrsoft.gitserver.entity.RepositoryEntity;
 import com.rnkrsoft.gitserver.exception.RepositoryCreateFailureException;
 import com.rnkrsoft.gitserver.exception.UninitializedGitServerException;
+import com.rnkrsoft.gitserver.service.RepositoryService;
 import com.rnkrsoft.gitserver.service.domain.QueryRepositoryRequest;
 import com.rnkrsoft.gitserver.service.domain.QueryRepositoryResponse;
 import com.rnkrsoft.log.Logger;
 import com.rnkrsoft.log.LoggerFactory;
-import com.rnkrsoft.orm.Pagination;
-import com.rnkrsoft.gitserver.service.RepositoryService;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;

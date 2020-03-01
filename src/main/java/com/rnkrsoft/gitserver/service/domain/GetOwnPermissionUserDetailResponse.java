@@ -26,13 +26,13 @@ public class GetOwnPermissionUserDetailResponse {
 
     @Data
     static class NoneRepositoryPermissionRecord {
-        final List<PermissionEnum> operates = new ArrayList();
+        final List<PermissionEnum> operates = new ArrayList<PermissionEnum>();
     }
 
     @Data
     static class RepositoryPermissionRecord {
         String repositoryName;
         String username;
-        final List<PermissionEnum> operates = new ArrayList();
+        final List<PermissionEnum> operates = new ArrayList<PermissionEnum>();
     }
 }

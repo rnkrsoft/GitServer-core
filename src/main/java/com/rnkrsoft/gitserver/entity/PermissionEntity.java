@@ -1,12 +1,9 @@
 package com.rnkrsoft.gitserver.entity;
 
 import com.rnkrsoft.gitserver.enums.PermissionEnum;
-import com.rnkrsoft.orm.BaseEntity;
+import com.rnkrsoft.orm.entity.BaseEntity;
 import com.rnkrsoft.orm.annotation.*;
 import lombok.Data;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Comment("仓库信息表")

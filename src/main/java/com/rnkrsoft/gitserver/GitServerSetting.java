@@ -27,14 +27,16 @@ public final class GitServerSetting {
         return fileLoader;
     }
 
-    public static GitServerSettingBuilder builder(){
+    public static GitServerSettingBuilder builder() {
         return new GitServerSettingBuilder();
     }
-    public static class GitServerSettingBuilder{
+
+    public static class GitServerSettingBuilder {
         private String repositoriesHome;
         private int sshPort;
         private int httpPort;
         private FileLoader fileLoader;
+
         private GitServerSettingBuilder() {
         }
 
@@ -58,7 +60,7 @@ public final class GitServerSetting {
             return this;
         }
 
-        public GitServerSetting build(){
+        public GitServerSetting build() {
             GitServerSetting setting = new GitServerSetting();
             setting.repositoriesHome = repositoriesHome;
             setting.sshPort = sshPort;

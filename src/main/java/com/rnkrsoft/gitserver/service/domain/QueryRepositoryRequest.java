@@ -3,6 +3,7 @@ package com.rnkrsoft.gitserver.service.domain;
 import lombok.Data;
 
 import java.io.Serializable;
+
 @Data
 public class QueryRepositoryRequest implements Serializable {
     /**
@@ -22,7 +23,7 @@ public class QueryRepositoryRequest implements Serializable {
      */
     String lastUpdateDate;
     /**
-     *拥有者
+     * 拥有者
      */
     String owner;
     /**

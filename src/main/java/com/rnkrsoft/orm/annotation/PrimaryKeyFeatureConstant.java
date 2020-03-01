@@ -1,7 +1,7 @@
 package com.rnkrsoft.orm.annotation;
 
 /**
- * Created by rnkrsoft.com on 2017/1/4.
+ * Created by woate on 2017/1/4.
  * 主键生成特征字符串常量
  */
 public interface PrimaryKeyFeatureConstant {

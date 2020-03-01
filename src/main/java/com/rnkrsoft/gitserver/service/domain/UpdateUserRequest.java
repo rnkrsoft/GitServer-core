@@ -13,7 +13,7 @@ public class UpdateUserRequest {
      */
     String email;
     /**
-     *  password 用户输入的密码
+     * password 用户输入的密码
      */
     String password;
     /**

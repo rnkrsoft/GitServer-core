@@ -1,9 +1,7 @@
 package com.rnkrsoft.logtrace;
 
-import java.lang.*;
-
 /**
- * Created by rnkrsoft.com on 2017/1/6.
+ * Created by woate on 2017/1/6.
  */
 public class SubError implements Error {
     /**
@@ -15,7 +13,7 @@ public class SubError implements Error {
      */
     PlaceHolder desc = null;
 
-    public SubError(String code, String format, Object ... args) {
+    public SubError(String code, String format, Object... args) {
         this.code = code;
         this.desc = new PlaceHolder(format, args);
     }

@@ -46,18 +46,20 @@ public class ActionService {
      */
     public static final String REVOKE_USER_ACTION = "REVOKE_USER_ACTION";
 
-    public AjaxResponse preform(AjaxRequest request){
+    public AjaxResponse preform(AjaxRequest request) {
         return AjaxResponse.SUCCESS;
     }
-    public NanoHTTPD.Response ajax(NanoHTTPD.IHTTPSession session){
+
+    public NanoHTTPD.Response ajax(NanoHTTPD.IHTTPSession session) {
 
         return NanoHTTPD.Response.newFixedLengthResponse("login success!");
     }
-    public NanoHTTPD.Response login(String usename, String password){
+
+    public NanoHTTPD.Response login(String usename, String password) {
         return NanoHTTPD.Response.newFixedLengthResponse("login success!");
     }
 
-    public NanoHTTPD.Response logout(NanoHTTPD.IHTTPSession session){
+    public NanoHTTPD.Response logout(NanoHTTPD.IHTTPSession session) {
         String token = session.getCookies().read("token");
         //fixme 解出username 并清空token
         return NanoHTTPD.Response.newFixedLengthResponse("login success!");

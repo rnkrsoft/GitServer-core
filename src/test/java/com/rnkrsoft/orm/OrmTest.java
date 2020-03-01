@@ -2,17 +2,11 @@ package com.rnkrsoft.orm;
 
 import com.rnkrsoft.gitserver.entity.PermissionEntity;
 import com.rnkrsoft.gitserver.entity.UserEntity;
-import com.rnkrsoft.orm.annotation.*;
-import com.rnkrsoft.orm.metadata.ColumnMetadata;
+import com.rnkrsoft.orm.jdbc.executor.SimpleJdbcExecutor;
 import com.rnkrsoft.orm.metadata.TableMetadata;
-import lombok.Data;
 import org.junit.Test;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 public class OrmTest {
 
@@ -38,7 +32,7 @@ public class OrmTest {
                 .jdbcDriverClassName("org.sqlite.JDBC")
                 .jdbcUrl("jdbc:sqlite:sample.db")
                 .build());
-        Orm.INSTANCE.executeUpdate("drop table demo");
+        new SimpleJdbcExecutor(Orm.INSTANCE).executeUpdate("drop table demo");
 //        Orm.INSTANCE.executeUpdate("create table demo(name varchar(20), age int)");
 //        Orm.INSTANCE.executeUpdate("insert into demo(name, age) values('1234', 20)");
     }

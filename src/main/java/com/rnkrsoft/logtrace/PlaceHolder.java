@@ -3,7 +3,7 @@ package com.rnkrsoft.logtrace;
 import com.rnkrsoft.util.MessageFormatter;
 
 /**
- * Created by rnkrsoft.com on 2017/1/6.
+ * Created by woate on 2017/1/6.
  */
 public class PlaceHolder {
     String format;

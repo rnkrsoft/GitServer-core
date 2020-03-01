@@ -1,6 +1,6 @@
 package com.rnkrsoft.gitserver.entity;
 
-import com.rnkrsoft.orm.BaseEntity;
+import com.rnkrsoft.orm.entity.BaseEntity;
 import com.rnkrsoft.orm.annotation.*;
 import lombok.Data;
 

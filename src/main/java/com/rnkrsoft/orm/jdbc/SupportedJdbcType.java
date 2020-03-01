@@ -1,9 +1,9 @@
-package com.rnkrsoft.orm;
+package com.rnkrsoft.orm.jdbc;
 
 import com.rnkrsoft.interfaces.EnumStringCode;
 
 /**
- * Created by rnkrsoft.com on 2018/6/22.
+ * Created by woate on 2018/6/22.
  * 支持的数据类型
  */
 public enum SupportedJdbcType implements EnumStringCode {
@@ -41,9 +41,9 @@ public enum SupportedJdbcType implements EnumStringCode {
         return desc;
     }
 
-    public static SupportedJdbcType valueOfCode(String code){
-        for (SupportedJdbcType value : values()){
-            if (value.code.equalsIgnoreCase(code)){
+    public static SupportedJdbcType valueOfCode(String code) {
+        for (SupportedJdbcType value : values()) {
+            if (value.code.equalsIgnoreCase(code)) {
                 return value;
             }
         }
