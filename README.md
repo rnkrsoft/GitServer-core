@@ -1,7 +1,7 @@
 # GitServer-core
 GitServer核心Java代码
 ## Design Principle
-基于jgit + sshd实现git管理协议，内建一个简单的http管理服务
+基于jgit + sshd实现git管理协议，内建一个简单的http管理服务。
 
 ## Web Page
 
@@ -35,7 +35,7 @@ GitServer核心Java代码
 
 ## Build
 
-
+xxxx
 
 ## Developers
 
