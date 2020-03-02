@@ -18,7 +18,7 @@ public class JdbcStatementGeneratorTest {
         JdbcStatement statement = new JdbcStatement(JdbcStatementType.INSERT, tableMetadata, columnMetadatas, null, entity);
         JdbcStatementGenerator.insert(statement);
         System.out.println(statement.getPlaceholderSql());
-        System.out.println(statement.getValues());
+        System.out.println(statement.getPlaceholderValues());
     }
 
     @Test
@@ -30,7 +30,7 @@ public class JdbcStatementGeneratorTest {
         JdbcStatement statement = new JdbcStatement(JdbcStatementType.INSERT_SELECTIVE, tableMetadata, new ColumnMetadata[]{tableMetadata.getColumn("username"), tableMetadata.getColumn("password")}, null, entity);
         JdbcStatementGenerator.insertSelective(statement);
         System.out.println(statement.getPlaceholderSql());
-        System.out.println(statement.getValues());
+        System.out.println(statement.getPlaceholderValues());
     }
 
     @Test
@@ -42,7 +42,7 @@ public class JdbcStatementGeneratorTest {
         JdbcStatement statement = new JdbcStatement(JdbcStatementType.DELETE_PRIMARY_KEY, tableMetadata, null, null, entity);
         JdbcStatementGenerator.deletePrimaryKey(statement);
         System.out.println(statement.getPlaceholderSql());
-        System.out.println(statement.getValues());
+        System.out.println(statement.getPlaceholderValues());
     }
 
     @Test
@@ -55,7 +55,7 @@ public class JdbcStatementGeneratorTest {
         JdbcStatement statement = new JdbcStatement(JdbcStatementType.DELETE_SELECTIVE, tableMetadata, new ColumnMetadata[]{tableMetadata.getColumn("username"), tableMetadata.getColumn("password")}, null, entity);
         JdbcStatementGenerator.deleteSelective(statement);
         System.out.println(statement.getPlaceholderSql());
-        System.out.println(statement.getValues());
+        System.out.println(statement.getPlaceholderValues());
     }
 
     @Test
@@ -67,7 +67,7 @@ public class JdbcStatementGeneratorTest {
         JdbcStatement statement = new JdbcStatement(JdbcStatementType.UPDATE_PRIMARY_KEY, tableMetadata, null, null, entity);
         JdbcStatementGenerator.updatePrimaryKey(statement);
         System.out.println(statement.getPlaceholderSql());
-        System.out.println(statement.getValues());
+        System.out.println(statement.getPlaceholderValues());
     }
 
     @Test
@@ -80,7 +80,7 @@ public class JdbcStatementGeneratorTest {
         JdbcStatement statement = new JdbcStatement(JdbcStatementType.UPDATE_PRIMARY_KEY_SELECTIVE, tableMetadata, new ColumnMetadata[]{tableMetadata.getColumn("username"), tableMetadata.getColumn("password")}, null, entity);
         JdbcStatementGenerator.updatePrimaryKeySelective(statement);
         System.out.println(statement.getPlaceholderSql());
-        System.out.println(statement.getValues());
+        System.out.println(statement.getPlaceholderValues());
     }
 
     @Test
@@ -92,6 +92,6 @@ public class JdbcStatementGeneratorTest {
         JdbcStatement statement = new JdbcStatement(JdbcStatementType.SELECT_SELECTIVE, tableMetadata, new ColumnMetadata[]{tableMetadata.getColumn("password")}, null, entity);
         JdbcStatementGenerator.selectSelective(statement);
         System.out.println(statement.getPlaceholderSql());
-        System.out.println(statement.getValues());
+        System.out.println(statement.getPlaceholderValues());
     }
 }

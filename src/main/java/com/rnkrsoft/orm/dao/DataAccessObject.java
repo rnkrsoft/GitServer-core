@@ -1,13 +1,18 @@
-package com.rnkrsoft.orm;
+package com.rnkrsoft.orm.dao;
 
+import com.rnkrsoft.orm.Orm;
+import com.rnkrsoft.orm.OrmSetting;
 import com.rnkrsoft.orm.annotation.NameMode;
 import com.rnkrsoft.orm.annotation.WordMode;
 import com.rnkrsoft.orm.condition.JdbcCondition;
 import com.rnkrsoft.orm.entity.Pagination;
+import com.rnkrsoft.orm.extractor.EntityExtractorHelper;
 import com.rnkrsoft.orm.jdbc.SupportedJdbcType;
 import com.rnkrsoft.orm.jdbc.executor.JdbcExecutor;
+import com.rnkrsoft.orm.jdbc.executor.SimpleJdbcExecutor;
 import com.rnkrsoft.orm.metadata.ColumnMetadata;
 import com.rnkrsoft.orm.metadata.TableMetadata;
+import com.rnkrsoft.orm.session.SessionFactory;
 import com.rnkrsoft.orm.statement.JdbcStatement;
 import com.rnkrsoft.orm.statement.JdbcStatementHelper;
 import com.rnkrsoft.orm.statement.JdbcStatementType;
@@ -15,16 +20,46 @@ import com.rnkrsoft.orm.util.SqlScriptUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Orm 数据访问对象
  * Created by woate on 2020/02/24.
  */
 public class DataAccessObject<T> {
-    Orm orm;
     JdbcExecutor jdbcExecutor;
     TableMetadata tableMetadata;
+
+    final static EntityExtractorHelper entityExtractorHelper = new EntityExtractorHelper();
+    final static Map<Class, TableMetadata> tableMetadataMap = new HashMap<Class, TableMetadata>();
+    final static Map<Class, DataAccessObject> dataAccessObjects = new HashMap<Class, DataAccessObject>();
+
+    public static <T> DataAccessObject<T> dao(Class<T> entityClass){
+        return dataAccessObjects.get(entityClass);
+    }
+    /**
+     * 初始化
+     * @param setting
+     */
+    public static void init(OrmSetting setting){
+        scan(setting.getEntityClasses());
+    }
+    /**
+     * 扫描实体类对象
+     *
+     * @param entityClasses 实体类列表
+     */
+   public static void scan(Set<Class> entityClasses) {
+        for (Class entityClass : entityClasses) {
+            TableMetadata tableMetadata = entityExtractorHelper.extractTable(entityClass);
+            DataAccessObject dao = new DataAccessObject( new SimpleJdbcExecutor(), tableMetadata);
+            dataAccessObjects.put(entityClass, dao);
+            tableMetadataMap.put(entityClass, tableMetadata);
+        }
+    }
     /**
      * 一个用于将结果转换成JavaBean的行映射器
      */
@@ -70,8 +105,7 @@ public class DataAccessObject<T> {
         }
     };
 
-    public DataAccessObject(Orm orm, JdbcExecutor jdbcExecutor, TableMetadata tableMetadata) {
-        this.orm = orm;
+    public DataAccessObject(JdbcExecutor jdbcExecutor, TableMetadata tableMetadata) {
         this.jdbcExecutor = jdbcExecutor;
         this.tableMetadata = tableMetadata;
     }
@@ -84,7 +118,7 @@ public class DataAccessObject<T> {
     public int createTable() {
         String sql = SqlScriptUtils.generateCreateTable(tableMetadata.getEntityClass(), NameMode.auto, null, NameMode.auto, null, NameMode.auto, null, null, WordMode.lowerCase, WordMode.lowerCase, false);
         try {
-            return this.jdbcExecutor.executeUpdate(sql);
+            return this.jdbcExecutor.executeUpdate(SessionFactory.getSession(), sql);
         } catch (SQLException e) {
             throw new RuntimeException("insert happens error!", e);
         }
@@ -98,7 +132,7 @@ public class DataAccessObject<T> {
     public int dropTable() {
         String sql = SqlScriptUtils.generateDropTable(tableMetadata.getEntityClass(), NameMode.auto, null, NameMode.auto, null, NameMode.auto, null, WordMode.lowerCase, WordMode.lowerCase, false);
         try {
-            return this.jdbcExecutor.executeUpdate(sql);
+            return this.jdbcExecutor.executeUpdate(SessionFactory.getSession(), sql);
         } catch (SQLException e) {
             throw new RuntimeException("insert happens error!", e);
         }
@@ -114,7 +148,7 @@ public class DataAccessObject<T> {
     public int insert(T entity) {
         JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.INSERT, null, entity);
         try {
-            return this.jdbcExecutor.executeUpdate(statement);
+            return this.jdbcExecutor.executeUpdate(SessionFactory.getSession(), statement);
         } catch (SQLException e) {
             throw new RuntimeException("insert happens error!", e);
         }
@@ -130,7 +164,7 @@ public class DataAccessObject<T> {
     public int insertSelective(T entity) {
         JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.INSERT_SELECTIVE, null, entity);
         try {
-            return this.jdbcExecutor.executeUpdate(statement);
+            return this.jdbcExecutor.executeUpdate(SessionFactory.getSession(), statement);
         } catch (SQLException e) {
             throw new RuntimeException("insertSelective happens error!", e);
         }
@@ -146,7 +180,7 @@ public class DataAccessObject<T> {
     public int updateByPrimaryKey(T entity) {
         JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.UPDATE_PRIMARY_KEY, null, entity);
         try {
-            return this.jdbcExecutor.executeUpdate(statement);
+            return this.jdbcExecutor.executeUpdate(SessionFactory.getSession(), statement);
         } catch (SQLException e) {
             throw new RuntimeException("updateByPrimaryKey happens error!", e);
         }
@@ -162,7 +196,7 @@ public class DataAccessObject<T> {
     public int updateByPrimaryKeySelective(T entity) {
         JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.UPDATE_PRIMARY_KEY_SELECTIVE, null, entity);
         try {
-            return this.jdbcExecutor.executeUpdate(statement);
+            return this.jdbcExecutor.executeUpdate(SessionFactory.getSession(), statement);
         } catch (SQLException e) {
             throw new RuntimeException("updateByPrimaryKeySelective happens error!", e);
         }
@@ -177,7 +211,7 @@ public class DataAccessObject<T> {
     public int deleteByPrimaryKey(T entity) {
         JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.DELETE_PRIMARY_KEY, null, entity);
         try {
-            return this.jdbcExecutor.executeUpdate(statement);
+            return this.jdbcExecutor.executeUpdate(SessionFactory.getSession(), statement);
         } catch (SQLException e) {
             throw new RuntimeException("deleteByPrimaryKey happens error!", e);
         }
@@ -193,7 +227,7 @@ public class DataAccessObject<T> {
     public int countSelective(T entity, JdbcCondition condition) {
         final JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.COUNT_SELECTIVE, condition, entity);
         try {
-            return this.jdbcExecutor.executeQueryFirst(statement, new Orm.RowMapper<Integer>() {
+            return this.jdbcExecutor.executeQueryFirst(SessionFactory.getSession(), statement, new Orm.RowMapper<Integer>() {
                 @Override
                 public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
                     return rs.getInt(1);
@@ -214,7 +248,7 @@ public class DataAccessObject<T> {
     public List<T> selectSelective(T entity, JdbcCondition condition) {
         final JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.SELECT_SELECTIVE, condition, entity);
         try {
-            return this.jdbcExecutor.executeQuery(statement, JAVABEAN_ROW_MAPPER);
+            return this.jdbcExecutor.executeQuery(SessionFactory.getSession(), statement, JAVABEAN_ROW_MAPPER);
         } catch (SQLException e) {
             throw new RuntimeException("selectSelective happens error!", e);
         }
@@ -229,7 +263,7 @@ public class DataAccessObject<T> {
     public T selectByPrimaryKey(T entity) {
         final JdbcStatement statement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.SELECT_PRIMARY_KEY, null, entity);
         try {
-            List<T> result = this.jdbcExecutor.executeQuery(statement, JAVABEAN_ROW_MAPPER);
+            List<T> result = this.jdbcExecutor.executeQuery(SessionFactory.getSession(), statement, JAVABEAN_ROW_MAPPER);
             int size = result.size();
             if (size == 0) {
                 return null;
@@ -255,7 +289,7 @@ public class DataAccessObject<T> {
         //1.构建统计记录的sql语句，并执行
         Integer total = null;
         try {
-            total = this.jdbcExecutor.executeQueryFirst(countStatement, new Orm.RowMapper<Integer>() {
+            total = this.jdbcExecutor.executeQueryFirst(SessionFactory.getSession(), countStatement, new Orm.RowMapper<Integer>() {
                 @Override
                 public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
                     return rs.getInt(1);
@@ -268,7 +302,7 @@ public class DataAccessObject<T> {
         List<T> records = null;
         JdbcStatement selectStatement = JdbcStatementHelper.statement(tableMetadata, JdbcStatementType.PAGINATION_SELECT_SELECTIVE, condition, pagination);
         try {
-            records = this.jdbcExecutor.executeQuery(selectStatement, JAVABEAN_ROW_MAPPER);
+            records = this.jdbcExecutor.executeQuery(SessionFactory.getSession(), selectStatement, JAVABEAN_ROW_MAPPER);
         } catch (SQLException e) {
             throw new RuntimeException("query happens error!", e);
         }
@@ -278,6 +312,7 @@ public class DataAccessObject<T> {
     }
 
     public Pagination<T> query(Pagination<T> pagination, String sqlPlaceholder) {
-        return pagination;
+        //TODO 未实现
+        throw new RuntimeException("未实现");
     }
 }

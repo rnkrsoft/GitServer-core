@@ -53,7 +53,7 @@ public class JdbcStatementGenerator {
             }
             headerBuffer.append(" ").append(columnMetadata.getJdbcName());
             tailBuffer.append(" ?");
-            statement.getColumns().add(columnMetadata);
+            statement.getPlaceholderColumns().add(columnMetadata);
             i++;
         }
         StringBuilder buffer = new StringBuilder(1024);
@@ -79,7 +79,7 @@ public class JdbcStatementGenerator {
             }
             headerBuffer.append(" ").append(columnMetadata.getJdbcName());
             tailBuffer.append(" ?");
-            statement.getColumns().add(columnMetadata);
+            statement.getPlaceholderColumns().add(columnMetadata);
             i++;
         }
         StringBuilder buffer = new StringBuilder(1024);
@@ -105,7 +105,7 @@ public class JdbcStatementGenerator {
                 headerBuffer.append(" ").append(column.getLogicMode().getCode());
             }
             headerBuffer.append(" ").append(column.getJdbcName()).append(" ").append(column.getValueMode().getCode()).append(" ?");
-            statement.getColumns().add(column);
+            statement.getPlaceholderColumns().add(column);
         }
         statement.setPlaceholderSql(headerBuffer.toString());
     }
@@ -127,7 +127,7 @@ public class JdbcStatementGenerator {
                 buffer.append(logicMode(column, conditionOverride).getCode());
             }
             buffer.append(" ").append(column.getJdbcName()).append(" ").append(valueMode(column, conditionOverride).getCode()).append(" ?");
-            statement.getColumns().add(column);
+            statement.getPlaceholderColumns().add(column);
         }
         statement.setPlaceholderSql(buffer.toString());
     }
@@ -146,7 +146,7 @@ public class JdbcStatementGenerator {
                 headerBuffer.append(",");
             }
             headerBuffer.append(" ").append(columnMetadata.getJdbcName()).append(" = ? ");
-            statement.getColumns().add(columnMetadata);
+            statement.getPlaceholderColumns().add(columnMetadata);
             count++;
         }
         if (!primaryKeys.isEmpty()) {
@@ -158,7 +158,7 @@ public class JdbcStatementGenerator {
                     headerBuffer.append(column.getLogicMode().getCode());
                 }
                 headerBuffer.append(column.getJdbcName()).append(" ").append(column.getValueMode().getCode()).append(" ?");
-                statement.getColumns().add(column);
+                statement.getPlaceholderColumns().add(column);
             }
         }
         statement.setPlaceholderSql(headerBuffer.toString());
@@ -180,7 +180,7 @@ public class JdbcStatementGenerator {
                 buffer.append(",");
             }
             buffer.append(" ").append(columnMetadata.getJdbcName()).append(" = ? ");
-            statement.getColumns().add(columnMetadata);
+            statement.getPlaceholderColumns().add(columnMetadata);
             count++;
         }
         if (!primaryKeys.isEmpty()) {
@@ -192,7 +192,7 @@ public class JdbcStatementGenerator {
                     buffer.append(column.getLogicMode().getCode());
                 }
                 buffer.append(column.getJdbcName()).append(" ").append(column.getValueMode().getCode()).append(" ?");
-                statement.getColumns().add(column);
+                statement.getPlaceholderColumns().add(column);
             }
         }
         statement.setPlaceholderSql(buffer.toString());
@@ -222,7 +222,7 @@ public class JdbcStatementGenerator {
                     buffer.append(" ").append(logicMode(columnMetadata, conditionOverride).getCode());
                 }
                 buffer.append(" ").append(columnMetadata.getJdbcName()).append(" ").append(valueMode(columnMetadata, conditionOverride).getCode()).append(" ?");
-                statement.getColumns().add(columnMetadata);
+                statement.getPlaceholderColumns().add(columnMetadata);
             }
         }
         statement.setPlaceholderSql(buffer.toString());
@@ -244,7 +244,7 @@ public class JdbcStatementGenerator {
                     buffer.append(" ").append(logicMode(columnMetadata, conditionOverride).getCode());
                 }
                 buffer.append(" ").append(columnMetadata.getJdbcName()).append(" ").append(valueMode(columnMetadata, conditionOverride).getCode()).append(" ?");
-                statement.getColumns().add(columnMetadata);
+                statement.getPlaceholderColumns().add(columnMetadata);
             }
         }
         statement.setPlaceholderSql(buffer.toString());
@@ -275,7 +275,7 @@ public class JdbcStatementGenerator {
                     buffer.append(" ").append(logicMode(columnMetadata, conditionOverride).getCode());
                 }
                 buffer.append(" ").append(columnMetadata.getJdbcName()).append(" ").append(valueMode(columnMetadata, conditionOverride).getCode()).append(" ?");
-                statement.getColumns().add(columnMetadata);
+                statement.getPlaceholderColumns().add(columnMetadata);
             }
         }
         buffer.append(" limit ").append(pagination.getPageSize()).append(" offset ").append(pagination.getSkipRecordNum());

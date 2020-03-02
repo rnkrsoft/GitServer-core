@@ -2,6 +2,7 @@ package com.rnkrsoft.orm.jdbc.executor;
 
 import com.rnkrsoft.orm.Orm;
 import com.rnkrsoft.orm.metadata.ColumnMetadata;
+import com.rnkrsoft.orm.session.Session;
 import com.rnkrsoft.orm.statement.JdbcStatement;
 import com.rnkrsoft.util.ValueUtils;
 
@@ -17,10 +18,8 @@ import java.util.List;
  * 一个简单的Jdbc执行器实现
  */
 public class SimpleJdbcExecutor implements JdbcExecutor {
-    Orm orm;
 
-    public SimpleJdbcExecutor(Orm orm) {
-        this.orm = orm;
+    public SimpleJdbcExecutor() {
     }
 
     /**
@@ -31,8 +30,8 @@ public class SimpleJdbcExecutor implements JdbcExecutor {
      * @return 变更条数
      * @throws SQLException 数据库异常
      */
-    public int executeUpdate(String sql, Object... values) throws SQLException {
-        Connection connection = this.orm.getConnect(false);
+    public int executeUpdate(Session session, String sql, Object... values) throws SQLException {
+        Connection connection = session.getConnection();
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(sql);
@@ -48,8 +47,8 @@ public class SimpleJdbcExecutor implements JdbcExecutor {
         }
     }
 
-    public int executeUpdate(JdbcStatement statement) throws SQLException {
-        Connection connection = this.orm.getConnect(false);
+    public int executeUpdate(Session session, JdbcStatement statement) throws SQLException {
+        Connection connection = session.getConnection();
         PreparedStatement ps = null;
         try {
             ps = connection.prepareStatement(statement.getPlaceholderSql());
@@ -74,8 +73,8 @@ public class SimpleJdbcExecutor implements JdbcExecutor {
      * @return
      * @throws SQLException
      */
-    public <T> List<T> executeQuery(JdbcStatement statement, Orm.RowMapper<T> rowMapper) throws SQLException {
-        Connection connection = this.orm.getConnect(false);
+    public <T> List<T> executeQuery(Session session, JdbcStatement statement, Orm.RowMapper<T> rowMapper) throws SQLException {
+        Connection connection = session.getConnection();
         PreparedStatement ps = null;
         ResultSet rs = null;
         final List<T> result = new ArrayList<T>();
@@ -101,8 +100,8 @@ public class SimpleJdbcExecutor implements JdbcExecutor {
         return result;
     }
 
-    public <T> T executeQueryFirst(JdbcStatement statement, Orm.RowMapper<T> rowMapper) throws SQLException {
-        Connection connection = this.orm.getConnect(false);
+    public <T> T executeQueryFirst(Session session, JdbcStatement statement, Orm.RowMapper<T> rowMapper) throws SQLException {
+        Connection connection = session.getConnection();
         PreparedStatement ps = null;
         ResultSet rs = null;
         T object = null;
@@ -148,12 +147,12 @@ public class SimpleJdbcExecutor implements JdbcExecutor {
      * @throws SQLException
      */
     void setParameter(PreparedStatement ps, JdbcStatement statement) throws SQLException {
-        List<ColumnMetadata> columnMetadataList = statement.getColumns();
+        List<ColumnMetadata> columnMetadataList = statement.getPlaceholderColumns();
         int columnSize = columnMetadataList.size();
         for (int i = 0; i < columnSize; i++) {
             ColumnMetadata columnMetadata = columnMetadataList.get(i);
             Class javaType = columnMetadata.getJavaType();
-            Object value = ValueUtils.convert(statement.getValues()[i], javaType);
+            Object value = ValueUtils.convert(statement.getPlaceholderValues()[i], javaType);
             ps.setObject(i + 1, value);
         }
     }

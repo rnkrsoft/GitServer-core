@@ -1,102 +1,113 @@
 package com.rnkrsoft.orm;
 
-import com.rnkrsoft.orm.jdbc.executor.SimpleJdbcExecutor;
-import com.rnkrsoft.orm.extractor.EntityExtractorHelper;
-import com.rnkrsoft.orm.metadata.TableMetadata;
-import com.rnkrsoft.util.MessageFormatter;
+import com.rnkrsoft.orm.dao.DataAccessObject;
+import com.rnkrsoft.orm.datasource.UnpooledDataSource;
+import com.rnkrsoft.orm.session.Session;
+import com.rnkrsoft.orm.session.SessionFactory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import javax.sql.DataSource;
+import java.sql.*;
+import java.util.Properties;
 
 /**
  * Created by woate on 2020/02/24.
  * Orm和心累
  */
-public class Orm {
-    OrmSetting setting;
-    final EntityExtractorHelper entityExtractorHelper;
-    final Map<Class, TableMetadata> tableMetadataMap = new HashMap<Class, TableMetadata>();
-    final Map<Class, DataAccessObject> dataAccessObjects = new HashMap<Class, DataAccessObject>();
+public final class Orm {
+    private final OrmSetting setting;
+    private DataSource dataSource;
 
-    public Orm(OrmSetting setting) {
-        this.setting = setting;
-        scan(this.setting.entityClasses);
-        this.entityExtractorHelper = new EntityExtractorHelper();
+    /**
+     * 通过配置对象创建Orm实例
+     * @param setting 配置对象
+     * @throws SQLException 如果没找到驱动类或者数据源抛出
+     */
+    private Orm(OrmSetting setting) throws SQLException {
+        Class driverClass = null;
         try {
-            initDataBase(setting.getJdbcDriverClassName(), setting.getJdbcUrl(), setting.getUsername(), setting.getPassword());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    <T> DataAccessObject<T> lookupDao(Class entityClass) {
-        return dataAccessObjects.get(entityClass);
-    }
-
-    void initDataBase(String jdbcDriverClassName, String jdbcUrl, String username, String password) throws SQLException {
-        try {
-            Class.forName(jdbcDriverClassName);
+            driverClass = Class.forName(setting.getJdbcDriverClassName());
         } catch (ClassNotFoundException e) {
-            throw new SQLException(MessageFormatter.format("please check '{}'", jdbcDriverClassName));
+           throw new SQLException("not found jdbc driver " + setting.getJdbcDriverClassName(), e);
         }
-
-
-    }
-
-
-    /**
-     * 扫描实体类对象
-     *
-     * @param entityClasses 实体类列表
-     */
-    void scan(Set<Class> entityClasses) {
-        EntityExtractorHelper helper = new EntityExtractorHelper();
-        for (Class entityClass : entityClasses) {
-            TableMetadata tableMetadata = helper.extractTable(entityClass);
-            DataAccessObject dataAccessObject = new DataAccessObject(this, new SimpleJdbcExecutor(this), tableMetadata);
-            dataAccessObjects.put(entityClass, dataAccessObject);
-            tableMetadataMap.put(entityClass, tableMetadata);
+        //如果是数据库连接池
+        if(DataSource.class.isAssignableFrom(driverClass)){
+            //TODO 数据源未实现
+            throw new RuntimeException("TODO 数据源未实现");
+        }else if (Driver.class.isAssignableFrom(driverClass)){
+            this.dataSource = new UnpooledDataSource(setting.getJdbcDriverClassName(), setting.getJdbcUrl(), setting.getUsername(), setting.getPassword());
         }
+        this.setting = setting;
+        //使用当前的配置信息初始化数据访问对象
+        DataAccessObject.init(setting);
     }
 
     /**
-     * 获取数据库链接
-     *
-     * @param pooled 是否进行池化
-     * @return 数据库连接
-     * @throws SQLException
+     * 获取Orm会话信息
+     * @return 会话对象
      */
-    public Connection getConnect(boolean pooled) throws SQLException {
-        Connection connection = DriverManager.getConnection(this.setting.getJdbcUrl(), this.setting.getUsername(), this.setting.getPassword());
-        return connection;
+    public Session getSession(){
+       return SessionFactory.createSession(this);
     }
 
+    /**
+     * 获取数据库连接
+     * @return 数据库连接对象
+     * @throws SQLException 数据库异常
+     */
+    public Connection getConnection() throws SQLException {
+        return this.dataSource.getConnection(setting.getUsername(), setting.getPassword());
+    }
 
     static Orm INSTANCE;
 
     /**
-     * 获取数据访问对象
-     *
-     * @param entityClass 实体类型
-     * @param <T>         实体类型
-     * @return 数据访问对象实例
+     * 使用propeties进行初始化
+     * @param properties 配置对象
+     * @throws SQLException  数据库异常
+     * @see #init(OrmSetting)
      */
-    public static <T> DataAccessObject<T> dao(Class entityClass) {
-        return INSTANCE.lookupDao(entityClass);
+    public static synchronized void init(Properties properties) throws SQLException {
+        init(OrmSetting.builder()
+                .jdbcDriverClassName(properties.getProperty("orm.jdbc.driver"))
+                .jdbcUrl(properties.getProperty("orm.jdbc.url"))
+                .username(properties.getProperty("orm.jdbc.username"))
+                .password(properties.getProperty("orm.jdbc.password"))
+                .build());
     }
 
-    public static synchronized void init(OrmSetting setting) {
+    /**
+     * 初始化Orm
+     * @param setting 配置对象
+     * @return 初始化好的Orm对象
+     * @throws SQLException 数据库异常
+     * @see #init(Properties)
+     */
+    public static synchronized Orm init(OrmSetting setting) throws SQLException {
         if (INSTANCE != null) {
 
         }
         INSTANCE = new Orm(setting);
+        return INSTANCE;
     }
 
+    /**
+     * 获取会话对象
+     * @return 会话对象
+     * @see #getSession()
+     */
+    public static Session session(){
+        return INSTANCE.getSession();
+    }
+
+    /**
+     * 获取数据库连接
+     * @return 连接对象
+     * @throws SQLException 数据库异常
+     * @see #getConnection()
+     */
+    public static Connection connection() throws SQLException {
+        return INSTANCE.getConnection();
+    }
     /**
      * 行映射器
      *

@@ -4,6 +4,7 @@ import com.rnkrsoft.gitserver.entity.PermissionEntity;
 import com.rnkrsoft.gitserver.entity.UserEntity;
 import com.rnkrsoft.orm.jdbc.executor.SimpleJdbcExecutor;
 import com.rnkrsoft.orm.metadata.TableMetadata;
+import com.rnkrsoft.orm.dao.DataAccessObject;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -11,13 +12,13 @@ import java.sql.SQLException;
 public class OrmTest {
 
     @Test
-    public void scan() {
+    public void scan() throws SQLException {
         Orm.init(OrmSetting.builder()
                 .entityClass(UserEntity.class, PermissionEntity.class)
                 .jdbcDriverClassName("org.sqlite.JDBC")
                 .jdbcUrl("jdbc:sqlite:sample.db")
                 .build());
-        DataAccessObject<UserEntity> dao = Orm.dao(UserEntity.class);
+        DataAccessObject<UserEntity> dao = Orm.session().dao(UserEntity.class);
         dao.insert(new UserEntity("test1", "", "", false));
     }
 
@@ -32,41 +33,6 @@ public class OrmTest {
                 .jdbcDriverClassName("org.sqlite.JDBC")
                 .jdbcUrl("jdbc:sqlite:sample.db")
                 .build());
-        new SimpleJdbcExecutor(Orm.INSTANCE).executeUpdate("drop table demo");
-//        Orm.INSTANCE.executeUpdate("create table demo(name varchar(20), age int)");
-//        Orm.INSTANCE.executeUpdate("insert into demo(name, age) values('1234', 20)");
-    }
-
-    @Test
-    public void executeQuery() throws SQLException {
-        Orm.init(OrmSetting.builder()
-                .entityClass(DemoEntity.class)
-                .jdbcDriverClassName("org.sqlite.JDBC")
-                .jdbcUrl("jdbc:sqlite:sample.db")
-                .build());
-        Orm orm = Orm.INSTANCE;
-        TableMetadata tableMetadata = orm.tableMetadataMap.get(DemoEntity.class);
-//        List<DemoEntity> list = orm.executeQuery(new ColumnMetadata[]{tableMetadata.getColumn("name")},"select name, age from demo where name = ?", new Orm.RowMapper<DemoEntity>() {
-//            @Override
-//            public DemoEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
-//                DemoEntity entity = new DemoEntity();
-//                entity.name = rs.getString("name");
-//                entity.age = rs.getInt("age");
-//                return entity;
-//            }
-//        }, "1234");
-//        System.out.println(list);
-
-//        List<DemoEntity> list2 = dao.executeQuery("select name, age from demo", new Orm.RowMapper<DemoEntity>() {
-//            @Override
-//            public DemoEntity mapRow(ResultSet rs, int rowNum) throws SQLException {
-//                DemoEntity entity = new DemoEntity();
-//                entity.name = rs.getString("name");
-//                entity.age = rs.getInt("age");
-//                return entity;
-//            }
-//        });
-//        System.out.println(list2);
-
+        new SimpleJdbcExecutor().executeUpdate(Orm.session(), "drop table demo");
     }
 }

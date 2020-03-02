@@ -1,6 +1,7 @@
 package com.rnkrsoft.orm.jdbc.executor;
 
 import com.rnkrsoft.orm.Orm;
+import com.rnkrsoft.orm.session.Session;
 import com.rnkrsoft.orm.statement.JdbcStatement;
 
 import java.sql.SQLException;
@@ -17,7 +18,7 @@ public interface JdbcExecutor {
      * @return 影响记录条数
      * @throws SQLException 执行异常
      */
-    int executeUpdate(String placeholderSql, Object... values) throws SQLException;
+    int executeUpdate(Session session, String placeholderSql, Object... values) throws SQLException;
 
     /**
      * 执行语句对象
@@ -25,7 +26,7 @@ public interface JdbcExecutor {
      * @return 影响记录条数
      * @throws SQLException 执行异常
      */
-    int executeUpdate(JdbcStatement statement) throws SQLException;
+    int executeUpdate(Session session, JdbcStatement statement) throws SQLException;
 
     /**
      * 执行语句查询，返回一个数据映射为JavaBean的列表
@@ -35,7 +36,7 @@ public interface JdbcExecutor {
      * @return 含有Entity对象的列表，无记录时返回空的list，不用检查是否为null
      * @throws SQLException 执行异常
      */
-    <T> List<T> executeQuery(JdbcStatement statement, Orm.RowMapper<T> rowMapper) throws SQLException;
+    <T> List<T> executeQuery(Session session, JdbcStatement statement, Orm.RowMapper<T> rowMapper) throws SQLException;
 
     /**
      * 执行语句查询，返回第一条满足条件的记录，如果没有返回null
@@ -45,5 +46,5 @@ public interface JdbcExecutor {
      * @return Entity对象,无记录时返回null
      * @throws SQLException 执行异常
      */
-    <T> T executeQueryFirst(JdbcStatement statement, Orm.RowMapper<T> rowMapper) throws SQLException;
+    <T> T executeQueryFirst(Session session, JdbcStatement statement, Orm.RowMapper<T> rowMapper) throws SQLException;
 }

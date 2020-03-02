@@ -10,10 +10,25 @@ import java.util.Set;
  */
 @Getter
 public final class OrmSetting {
+    /**
+     * 实体类列表
+     */
     final Set<Class> entityClasses = new HashSet<Class>();
+    /**
+     * 数据库驱动类
+     */
     String jdbcDriverClassName;
+    /**
+     * 数据库连接串
+     */
     String jdbcUrl;
+    /**
+     * 用户名
+     */
     String username;
+    /**
+     * 密码
+     */
     String password;
 
     private OrmSetting() {
