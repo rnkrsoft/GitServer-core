@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,86 +46,134 @@ public class JSON {
      */
     public static final Map<String, String> parse(String json) {
         char[] chars = json.toCharArray();
+        final char[] key = new char[chars.length];
+        int keyLength = 0;
+        final char[] value = new char[chars.length];
+        int valueLength = 0;
         final Map<String, String> map = new HashMap<String, String>();
-        int length = chars.length;
-        int beginObjectIdx = -1;
-        boolean matchKey = false;
-        boolean matchValue = false;
-        int quotationIdx = -1;
-        int matchComma = -1;
-        int commaIdx = -1;
-        boolean gameOver = false;
-        int beginValueIdx = -1;
-        boolean firstMatchChar = false;
-        boolean matchColon = false;
-        String key = null;
+        int length = chars.length;//JSON字符串长度
+        int topBeginObjectIdx = -1;//JSON对象最外层{开始开始坐标
+        boolean matchedKey = false;//是否匹配了键
+        boolean matchedValue = false;//是否匹配了值
+        int quotationIdx = -1;//引号开始索引
+        int matchComma = -1;//逗号的索引
+        int commaIdx = -1;//
+        boolean gameOver = false;//结束
+        int beginValueIdx = -1;//值开始索引
+        boolean firstMatchedChar = false;//当前是否为第一个匹配的字符
+        boolean matchedColon = false;//是否匹配了冒号
+        boolean matchedEscape = false;//是否已匹配转义字符
         for (int i = 0; i < length; i++) {
             char c = chars[i];
             if (c == ' ' || c == '\n' || c == '\r') {
-                if (matchKey && matchColon && firstMatchChar && !matchValue) {
-                    String value = json.substring(beginValueIdx, i);
-                    map.put(key, value);
-                    matchValue = true;
+                if (matchedKey && matchedColon && !matchedValue) {//匹配了键，匹配了冒号，第一个字符，同时没有值匹配，说明当前是冒号之后值开始之前
+                    if (firstMatchedChar) {
+                        map.put(new String(Arrays.copyOf(key, keyLength)).trim(), new String(Arrays.copyOf(value, valueLength)).trim());
+                        keyLength = 0;
+                        valueLength = 0;
+                        matchedValue = true;
+                        continue;//已处理当前字符
+                    }
                 }
-            } else if (c == ':') {
-                matchColon = true;
-            } else {
-                if (gameOver) {
-                    throw new IllegalArgumentException("illegal json format!");
-                }
-                if (c == '{') {
-                    if (beginObjectIdx == -1) {
-                        beginObjectIdx = i;
-                    }
-                } else if (c == '}') {
-                    if (matchComma == 1) {
-                        throw new IllegalArgumentException("illegal json format! cause: index[" + commaIdx + "] = \"" + chars[commaIdx] + "\" is illegal!");
-                    }
-                    gameOver = true;
-                } else if (c == ',') {
-                    //如果不在引号包裹里的逗号，是语法符号
-                    if (quotationIdx == -1) {
-                        matchKey = false;
-                        matchValue = false;
-                        matchColon = false;
-                        beginValueIdx = -1;
-                        commaIdx = i;
-                        matchComma = 1;
-                        firstMatchChar = false;
-                    }
-                } else if (c == '"') {
-                    if (matchComma == -1 || matchComma == 1) {
-                        matchComma = 0;
-                        commaIdx = -1;
-                    }
-                    if (quotationIdx == -1) {
-                        quotationIdx = i;
-                    }else if (quotationIdx != -1) {
-                        if (!matchKey) {
-                            if (quotationIdx > -1) {
-                                matchKey = true;
-                                key = json.substring(quotationIdx + 1, i);
-                            }
-                        } else if (!matchValue) {
-                                String value = json.substring(quotationIdx + 1, i);
-                                map.put(key, value);
-                                matchValue = true;
-                        } else if (matchKey && matchValue) {
-                            throw new IllegalArgumentException("illegal json format! cause: index[" + i + "] = \"" + c + "\" is illegal!");
-                        }
-                        quotationIdx = -1;
-                    }
-                } else if (c >= '0' || c <= '9' || c == '-' || c == '.') {
-                    if (matchKey && matchColon) {
-                        if (!firstMatchChar && beginValueIdx == -1) {
-                            firstMatchChar = true;
-                            beginValueIdx = i;
-                        }
-                    } else if (matchKey && matchColon && firstMatchChar && matchValue) {
-                        throw new IllegalArgumentException("illegal json format! cause: index[" + i + "] = \"" + c + "\" is illegal!");
-                    }
+            } else if (c == ':') {//当当前是冒号时需要检查之前是否有转义字符
+                if (matchedEscape) {
+
+                } else {//不是转义字符，则匹配冒号
+                    matchedColon = true;
+                    continue;//已处理当前字符
                 }
             }
+            if (gameOver) {
+                throw new IllegalArgumentException("illegal json format!");
+            }
+            if (matchedEscape) {
+                if (c == '\\' || c == '{' || c == '}' || c == ',' || c == '\'' || c >= '0' || c <= '9' || c == '-' || c == '.') {
+                    if (matchedKey){
+                        key[keyLength++] = c;
+                    }else{
+                        value[valueLength++] = c;
+                    }
+                }else{
+                    if (matchedKey){
+                        key[keyLength++] = '\\';
+                        key[keyLength++] = c;
+                    }else{
+                        value[valueLength++]  = '\\';
+                        value[valueLength++] = c;
+                    }
+                }
+                continue;
+            }
+            if (c == '{') {
+                if (topBeginObjectIdx == -1) {//如果顶层的开始符号{还没有
+                    topBeginObjectIdx = i;
+                    continue;//已处理当前字符
+                } else {
+                    map.put(new String(Arrays.copyOf(key, keyLength)).trim(), new String(Arrays.copyOf(value, valueLength)).trim());
+                    keyLength = 0;
+                    valueLength = 0;
+                    matchedValue = false;
+                }
+            } else if (c == '}') {
+                if (matchComma == 1) {
+                    throw new IllegalArgumentException("illegal json format! cause: index[" + commaIdx + "] = \"" + chars[commaIdx] + "\" is illegal!");
+                }
+                gameOver = true;
+            } else if (c == ',') {
+                //如果不在引号包裹里的逗号，是语法符号
+                if (quotationIdx == -1) {
+                    matchedKey = false;
+                    matchedValue = false;
+                    matchedColon = false;
+                    beginValueIdx = -1;
+                    commaIdx = i;
+                    matchComma = 1;
+                    firstMatchedChar = false;
+                }
+            } else if (c == '\'') {
+                if (matchComma == -1 || matchComma == 1) {
+                    matchComma = 0;
+                    commaIdx = -1;
+                }
+                if (quotationIdx == -1) {
+                    quotationIdx = i;
+                } else if (quotationIdx != -1) {
+                    if (!matchedKey) {
+                        if (quotationIdx > -1) {
+                            matchedKey = true;
+                        }
+                    } else if (!matchedValue) {
+                        map.put(new String(Arrays.copyOf(key, keyLength)).trim(), new String(Arrays.copyOf(value, valueLength)).trim());
+                        keyLength = 0;
+                        valueLength = 0;
+                        matchedValue = true;
+                    } else if (matchedKey && matchedValue) {
+                        throw new IllegalArgumentException("illegal json format! cause: index[" + i + "] = \"" + c + "\" is illegal!");
+                    }
+                    quotationIdx = -1;
+                }
+            } else if (c >= '0' || c <= '9' || c == '-' || c == '.') {
+                if (matchedKey && matchedColon) {
+                    if (!firstMatchedChar && beginValueIdx == -1) {
+                        firstMatchedChar = true;
+                        beginValueIdx = i;
+                    }
+                } else if (matchedKey && matchedColon && firstMatchedChar && matchedValue) {
+                    throw new IllegalArgumentException("illegal json format! cause: index[" + i + "] = \"" + c + "\" is illegal!");
+                }
+            }else if (c == '\\'){
+                if (matchedEscape){//当前字符是\ 并且重置matchedEscape
+                    if (matchedKey){
+                        key[keyLength++] = c;
+                    }else{
+                        value[valueLength++] = c;
+                    }
+                    matchedEscape = false;
+                }else{//当前字符是转义字符
+                    matchedEscape = true;
+                }
+            }
+
         }
         return map;
     }
