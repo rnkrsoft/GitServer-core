@@ -1,5 +1,6 @@
 package com.rnkrsoft.gitserver.http;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.junit.Test;
@@ -34,11 +35,12 @@ public class AjaxRequestTest {
     @Test
     public void getData() {
         AjaxRequest request = new AjaxRequest();
-        request.setData(new DemoBean1("123", 21));
+       Gson gson = new GsonBuilder().create();
+        request.setData(gson.toJson(new DemoBean1("123", 21)));
         request.setAction("register_user_action");
-        String json = new GsonBuilder().create().toJson(request);
+       String json = gson.toJson(request);
 
-        AjaxRequest<DemoBean1> request1 = new GsonBuilder().create().fromJson(json, new TypeToken<AjaxRequest<DemoBean1>>() {}.getType());
+        AjaxRequest request1 = new GsonBuilder().create().fromJson(json,AjaxRequest.class);
 
         System.out.println(request1.getData());
     }

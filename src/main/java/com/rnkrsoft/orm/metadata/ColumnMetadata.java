@@ -1,14 +1,13 @@
 package com.rnkrsoft.orm.metadata;
 
 import com.rnkrsoft.interfaces.EnumBase;
-import com.rnkrsoft.orm.jdbc.SupportedJdbcType;
 import com.rnkrsoft.orm.annotation.LogicMode;
 import com.rnkrsoft.orm.annotation.PrimaryKeyStrategy;
 import com.rnkrsoft.orm.annotation.ValueMode;
-import lombok.Builder;
+import com.rnkrsoft.orm.jdbc.SupportedJdbcType;
+import com.rnkrsoft.reflector.Reflector;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.lang.reflect.Field;
 
@@ -18,8 +17,6 @@ import java.lang.reflect.Field;
  */
 @Data
 @EqualsAndHashCode
-@NoArgsConstructor
-@Builder
 public class ColumnMetadata {
     /**
      * 是否为物理主键字段
@@ -33,10 +30,16 @@ public class ColumnMetadata {
      * 实体类对象
      */
     Class entityClass;
+    Field field;
+    Reflector reflector;
     /**
-     * 字段对象
+     * getter方法
      */
-    Field columnField;
+    Reflector.Invoker getter;
+    /**
+     * setter方法
+     */
+    Reflector.Invoker setter;
     /**
      * Java字段名称
      */
@@ -110,29 +113,21 @@ public class ColumnMetadata {
      */
     ValueMode valueMode = ValueMode.EQ;
 
-    public ColumnMetadata(boolean primaryKey, TableMetadata tableMetadata, Class entityClass, Field columnField, String javaName, Class javaType, String jdbcName, String fullJdbcType, Integer length, Integer precision, Integer scale, SupportedJdbcType jdbcType, Boolean nullable, Class enumClass, String comment, PrimaryKeyStrategy primaryKeyStrategy, String primaryKeyFeature, String defaultValue, Boolean autoIncrement, Boolean onUpdateCurrentTimestamp, LogicMode logicMode, ValueMode valueMode) {
+    public ColumnMetadata(boolean primaryKey, TableMetadata tableMetadata, Class entityClass, Field field, String javaName, Class javaType, String jdbcName) {
         this.primaryKey = primaryKey;
         this.tableMetadata = tableMetadata;
         this.entityClass = entityClass;
-        this.columnField = columnField;
+        this.reflector = Reflector.reflector(entityClass);
+        try {
+            this.getter = reflector.getGetter(javaName);
+            this.setter = reflector.getSetter(javaName);
+        } catch (NoSuchMethodException e) {
+
+        }
+        this.field = field;
         this.javaName = javaName;
         this.javaType = javaType;
         this.jdbcName = jdbcName;
-        this.fullJdbcType = fullJdbcType == null ? "VARCHAR(255)" : fullJdbcType;
-        this.length = length;
-        this.precision = precision;
-        this.scale = scale;
-        this.jdbcType = jdbcType == null ? SupportedJdbcType.VARCHAR : jdbcType;
-        this.nullable = nullable;
-        this.enumClass = enumClass;
-        this.comment = comment;
-        this.primaryKeyStrategy = primaryKeyStrategy;
-        this.primaryKeyFeature = primaryKeyFeature;
-        this.defaultValue = defaultValue;
-        this.autoIncrement = autoIncrement == null ? false : autoIncrement;
-        this.onUpdateCurrentTimestamp = onUpdateCurrentTimestamp == null ? false : autoIncrement;
-        this.logicMode = logicMode == null ? LogicMode.AND : logicMode;
-        this.valueMode = valueMode == null ? ValueMode.EQ : valueMode;
     }
 
     @Override
@@ -140,7 +135,8 @@ public class ColumnMetadata {
         final StringBuffer sb = new StringBuffer("ColumnMetadata{");
         sb.append("primaryKey=").append(primaryKey);
         sb.append(", entityClass=").append(entityClass);
-        sb.append(", columnField=").append(columnField);
+        sb.append(", getter=").append(getter);
+        sb.append(", setter=").append(setter);
         sb.append(", javaName='").append(javaName).append('\'');
         sb.append(", javaType=").append(javaType);
         sb.append(", jdbcName='").append(jdbcName).append('\'');
@@ -162,24 +158,18 @@ public class ColumnMetadata {
 
     public void setValue(Object obj, Object val) {
         try {
-            this.columnField.setAccessible(true);
-            this.columnField.set(obj, val);
-        } catch (IllegalAccessException e) {
+            this.setter.invoke(obj, val);
+        } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            this.columnField.setAccessible(false);
         }
     }
 
     public <T> T getValue(Object obj) {
         T val = null;
         try {
-            this.columnField.setAccessible(true);
-            val = (T) this.columnField.get(obj);
-        } catch (IllegalAccessException e) {
+            val = this.getter.invoke(obj);
+        } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            this.columnField.setAccessible(false);
         }
         return val;
     }

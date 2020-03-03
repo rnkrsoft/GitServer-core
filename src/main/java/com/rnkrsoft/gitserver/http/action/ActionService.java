@@ -1,8 +1,13 @@
 package com.rnkrsoft.gitserver.http.action;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.rnkrsoft.gitserver.http.AjaxRequest;
 import com.rnkrsoft.gitserver.http.AjaxResponse;
 import com.rnkrsoft.gitserver.http.NanoHTTPD;
+import org.apache.commons.io.IOUtils;
+
+import java.io.IOException;
 
 public class ActionService {
     /**
@@ -45,13 +50,18 @@ public class ActionService {
      * 收回给用户的权限
      */
     public static final String REVOKE_USER_ACTION = "REVOKE_USER_ACTION";
-
+    Gson gson = new GsonBuilder().create();
     public AjaxResponse preform(AjaxRequest request) {
         return AjaxResponse.SUCCESS;
     }
 
     public NanoHTTPD.Response ajax(NanoHTTPD.IHTTPSession session) {
+        try {
+            String body = IOUtils.toString(session.getInputStream(), "UTF-8");
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return NanoHTTPD.Response.newFixedLengthResponse("login success!");
     }
 

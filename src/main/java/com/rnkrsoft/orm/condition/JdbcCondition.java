@@ -22,71 +22,71 @@ public class JdbcCondition {
         return items.get(jdbcColumnName);
     }
 
-    public static JdbcConditionOverrideBuilder builder() {
-        return new JdbcConditionOverrideBuilder();
+    public static JdbcConditionBuilder builder() {
+        return new JdbcConditionBuilder();
     }
 
-    public static class JdbcConditionOverrideBuilder {
+    public static class JdbcConditionBuilder {
         private final Map<String, JdbcConditionItem> items = new HashMap<String, JdbcConditionItem>();
 
-        public JdbcConditionOverrideBuilder define(String name, LogicMode logicMode, ValueMode valueMode) {
+        public JdbcConditionBuilder define(String name, LogicMode logicMode, ValueMode valueMode) {
             items.put(name, new JdbcConditionItem(name, logicMode, valueMode));
             return this;
         }
 
-        public JdbcConditionOverrideBuilder andEq(String name) {
+        public JdbcConditionBuilder andEq(String name) {
             return define(name, LogicMode.AND, ValueMode.EQ);
         }
 
-        public JdbcConditionOverrideBuilder andLt(String name) {
+        public JdbcConditionBuilder andLt(String name) {
             return define(name, LogicMode.AND, ValueMode.LT);
         }
 
-        public JdbcConditionOverrideBuilder andLte(String name) {
+        public JdbcConditionBuilder andLte(String name) {
             return define(name, LogicMode.AND, ValueMode.LTE);
         }
 
-        public JdbcConditionOverrideBuilder andGt(String name) {
+        public JdbcConditionBuilder andGt(String name) {
             return define(name, LogicMode.AND, ValueMode.GT);
         }
 
-        public JdbcConditionOverrideBuilder andGte(String name) {
+        public JdbcConditionBuilder andGte(String name) {
             return define(name, LogicMode.AND, ValueMode.GTE);
         }
 
-        public JdbcConditionOverrideBuilder andNe(String name) {
+        public JdbcConditionBuilder andNe(String name) {
             return define(name, LogicMode.AND, ValueMode.NE);
         }
 
-        public JdbcConditionOverrideBuilder andLike(String name) {
+        public JdbcConditionBuilder andLike(String name) {
             return define(name, LogicMode.AND, ValueMode.LIKE);
         }
 
-        public JdbcConditionOverrideBuilder orEq(String name) {
+        public JdbcConditionBuilder orEq(String name) {
             return define(name, LogicMode.OR, ValueMode.EQ);
         }
 
-        public JdbcConditionOverrideBuilder orLt(String name) {
+        public JdbcConditionBuilder orLt(String name) {
             return define(name, LogicMode.OR, ValueMode.LT);
         }
 
-        public JdbcConditionOverrideBuilder orLte(String name) {
+        public JdbcConditionBuilder orLte(String name) {
             return define(name, LogicMode.OR, ValueMode.LTE);
         }
 
-        public JdbcConditionOverrideBuilder orGt(String name) {
+        public JdbcConditionBuilder orGt(String name) {
             return define(name, LogicMode.OR, ValueMode.GT);
         }
 
-        public JdbcConditionOverrideBuilder orGte(String name) {
+        public JdbcConditionBuilder orGte(String name) {
             return define(name, LogicMode.OR, ValueMode.GTE);
         }
 
-        public JdbcConditionOverrideBuilder orNe(String name) {
+        public JdbcConditionBuilder orNe(String name) {
             return define(name, LogicMode.OR, ValueMode.NE);
         }
 
-        public JdbcConditionOverrideBuilder orLike(String name) {
+        public JdbcConditionBuilder orLike(String name) {
             return define(name, LogicMode.OR, ValueMode.LIKE);
         }
 

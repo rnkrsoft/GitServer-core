@@ -73,13 +73,7 @@ public final class EntityExtractorHelper {
                 return;
             }
             //任意使用了一个字段注解的
-            ColumnMetadata columnMetadata = ColumnMetadata.builder()
-                    .tableMetadata(tableMetadata)
-                    .entityClass(tableMetadata.getEntityClass())
-                    .columnField(field)
-                    .javaName(field.getName())
-                    .javaType(field.getType())
-                    .build();
+            ColumnMetadata columnMetadata = new ColumnMetadata(false, tableMetadata, tableMetadata.getEntityClass(), field, field.getName(), field.getType(), (stringColumn != null ? stringColumn.name() : (numberColumn != null ? numberColumn.name() : dateColumn.name())));
             //提取该字段元信息
             if (!extractor.extractField(columnMetadata)) {
                 continue;

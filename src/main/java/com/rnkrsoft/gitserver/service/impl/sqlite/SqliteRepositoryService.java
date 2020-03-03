@@ -1,13 +1,24 @@
 package com.rnkrsoft.gitserver.service.impl.sqlite;
 
 import com.rnkrsoft.gitserver.GitServer;
+import com.rnkrsoft.gitserver.entity.RepositoryEntity;
 import com.rnkrsoft.gitserver.exception.RepositoryCreateFailureException;
 import com.rnkrsoft.gitserver.exception.UninitializedGitServerException;
+import com.rnkrsoft.gitserver.http.AjaxRequest;
+import com.rnkrsoft.gitserver.http.AjaxResponse;
 import com.rnkrsoft.gitserver.service.RepositoryService;
+import com.rnkrsoft.gitserver.service.domain.CreateRepositoryRequest;
+import com.rnkrsoft.gitserver.service.domain.CreateRepositoryResponse;
 import com.rnkrsoft.gitserver.service.domain.QueryRepositoryRequest;
 import com.rnkrsoft.gitserver.service.domain.QueryRepositoryResponse;
 import com.rnkrsoft.log.Logger;
 import com.rnkrsoft.log.LoggerFactory;
+import com.rnkrsoft.orm.Orm;
+import com.rnkrsoft.orm.dao.DataAccessObject;
+import com.rnkrsoft.orm.entity.Pagination;
+import com.rnkrsoft.orm.session.Session;
+import com.rnkrsoft.time.DateStyle;
+import com.rnkrsoft.util.DateUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -23,6 +34,45 @@ public class SqliteRepositoryService implements RepositoryService {
     Logger logger = LoggerFactory.getInstance();
 
     @Override
+    public AjaxResponse<CreateRepositoryResponse> createRepository(AjaxRequest<CreateRepositoryRequest> ajaxRequest) {
+        Session session = Orm.session();
+        DataAccessObject<RepositoryEntity> repositoryDao = session.dao(RepositoryEntity.class);
+        CreateRepositoryRequest request = ajaxRequest.getData();
+        if (repositoryDao.countSelective(RepositoryEntity.builder().repositoryName(request.getRepositoryName()).build()) > 0){
+            return new AjaxResponse("0001","仓库已存在");
+        }
+        int cnt = repositoryDao.insert(RepositoryEntity.builder().repositoryName(request.getRepositoryName()).owner(request.getOwner()).repositoryDesc(request.getOwner()).build());
+        if (cnt != 1){
+            return new AjaxResponse("0001","创建仓库失败");
+        }
+        try {
+            createRepository(request.getRepositoryName(), request.getOwner());
+        } catch (RepositoryCreateFailureException e) {
+            return new AjaxResponse("0001","创建仓库失败");
+        } catch (UninitializedGitServerException e) {
+            return new AjaxResponse("0001","创建仓库失败");
+        }
+        return AjaxResponse.SUCCESS;
+    }
+
+
+    @Override
+    public void createRepository(String repositoryName, String owner) throws RepositoryCreateFailureException, UninitializedGitServerException {
+
+        if (gitServer.getState() != GitServer.INIT) {
+            throw new UninitializedGitServerException("Git Server is uninitialized！");
+        }
+        try {
+            InitCommand initCommand = Git.init();
+            initCommand.setBare(true);
+            initCommand.setDirectory(getRepositoryPath(repositoryName + Constants.DOT_GIT_EXT));
+            initCommand.call();
+        } catch (GitAPIException e) {
+            throw new RepositoryCreateFailureException("Error while creating repository.", e);
+        }
+    }
+
+    @Override
     public Git openRepository(String name) throws RepositoryNotFoundException, UninitializedGitServerException {
         if (gitServer.getState() != GitServer.INIT) {
             throw new UninitializedGitServerException("Git Server is uninitialized！");
@@ -36,20 +86,6 @@ public class SqliteRepositoryService implements RepositoryService {
         return git;
     }
 
-    @Override
-    public void createRepository(String repositoryName, String owner) throws RepositoryCreateFailureException, UninitializedGitServerException {
-        if (gitServer.getState() != GitServer.INIT) {
-            throw new UninitializedGitServerException("Git Server is uninitialized！");
-        }
-        try {
-            InitCommand initCommand = Git.init();
-            initCommand.setBare(true);
-            initCommand.setDirectory(getRepositoryPath(repositoryName + Constants.DOT_GIT_EXT));
-            initCommand.call();
-        } catch (GitAPIException e) {
-            throw new RepositoryCreateFailureException("Error while creating repository.", e);
-        }
-    }
 
     public void renameRepository(String oldName, String newName) throws RepositoryNotFoundException, UninitializedGitServerException {
         if (gitServer.getState() != GitServer.INIT) {
@@ -96,8 +132,22 @@ public class SqliteRepositoryService implements RepositoryService {
     }
 
     @Override
-    public QueryRepositoryResponse queryRepository(QueryRepositoryRequest request) {
-        return null;
+    public AjaxResponse<QueryRepositoryResponse> queryRepository(AjaxRequest<QueryRepositoryRequest> ajaxRequest) {
+        Session session = Orm.session();
+        DataAccessObject<RepositoryEntity> repositoryDao = session.dao(RepositoryEntity.class);
+        QueryRepositoryRequest request = ajaxRequest.getData();
+        Pagination<RepositoryEntity> pagination = repositoryDao.querySelective(new Pagination<RepositoryEntity>(request.getPageSize(), request.getPageNo(), RepositoryEntity.builder().repositoryName(request.getRepositoryName()).owner(request.getOwner()).build()));
+        QueryRepositoryResponse response = new QueryRepositoryResponse();
+        response.setTotal(pagination.getTotal());
+        response.setPageNo(pagination.getCurPageNo());
+        for (RepositoryEntity entity : pagination.getRecords()){
+            response.addRecord(new QueryRepositoryResponse.Record(entity.getRepositoryName(),
+                    entity.getRepositoryDesc(),
+                    DateUtils.toString(entity.getCreateDate(), DateStyle.SECOND_FORMAT1),
+                    DateUtils.toString(entity.getLastUpdateDate(), DateStyle.SECOND_FORMAT1))
+            );
+        }
+        return new AjaxResponse<QueryRepositoryResponse>(response);
     }
 
 

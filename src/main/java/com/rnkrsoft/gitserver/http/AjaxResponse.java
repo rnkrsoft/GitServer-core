@@ -13,7 +13,13 @@ public class AjaxResponse<T> implements Serializable {
 
     private Result result;
     private T data;
-
+    public AjaxResponse(String code, String desc){
+        this.result = new Result(code, desc);
+    }
+    public AjaxResponse(T data) {
+        this.result = new Result("0000", "成功");
+        this.data = data;
+    }
     public AjaxResponse(Result result, T data) {
         this.result = result;
         this.data = data;

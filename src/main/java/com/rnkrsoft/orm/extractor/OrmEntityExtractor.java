@@ -5,6 +5,7 @@ import com.rnkrsoft.orm.jdbc.SupportedJdbcType;
 import com.rnkrsoft.orm.annotation.*;
 import com.rnkrsoft.orm.metadata.ColumnMetadata;
 import com.rnkrsoft.orm.metadata.TableMetadata;
+import com.rnkrsoft.reflector.Reflector;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Field;
@@ -37,7 +38,7 @@ public class OrmEntityExtractor implements EntityExtractor {
 
 
     public EntityExtractor extractFieldString(ColumnMetadata columnMetadata) {
-        StringColumn stringColumn = columnMetadata.getColumnField().getAnnotation(StringColumn.class);
+        StringColumn stringColumn = columnMetadata.getField().getAnnotation(StringColumn.class);
         if (stringColumn == null) {
             return this;
         }
@@ -87,6 +88,7 @@ public class OrmEntityExtractor implements EntityExtractor {
         if (dataType != null) {
             columnMetadata.setFullJdbcType(dataType);
         }
+        columnMetadata.setNullable(stringColumn.nullable());
         columnMetadata.setLogicMode(stringColumn.logicMode());
         columnMetadata.setValueMode(stringColumn.valueMode());
         ErrorContextFactory.instance().activity(null);
@@ -95,7 +97,7 @@ public class OrmEntityExtractor implements EntityExtractor {
 
 
     public EntityExtractor extractFieldNumber(ColumnMetadata columnMetadata) {
-        NumberColumn numberColumn = columnMetadata.getColumnField().getAnnotation(NumberColumn.class);
+        NumberColumn numberColumn = columnMetadata.getField().getAnnotation(NumberColumn.class);
         if (numberColumn == null) {
             return this;
         }
@@ -288,6 +290,7 @@ public class OrmEntityExtractor implements EntityExtractor {
         if (dataType != null) {
             columnMetadata.setFullJdbcType(dataType);
         }
+        columnMetadata.setNullable(numberColumn.nullable());
         columnMetadata.setLogicMode(numberColumn.logicMode());
         columnMetadata.setValueMode(numberColumn.valueMode());
         ErrorContextFactory.instance().activity(null);
@@ -302,7 +305,7 @@ public class OrmEntityExtractor implements EntityExtractor {
      */
     public EntityExtractor extractFieldDate(ColumnMetadata columnMetadata) {
         ErrorContextFactory.instance().activity("提取实体类{}的元信息", columnMetadata.getEntityClass());
-        DateColumn dateColumn = columnMetadata.getColumnField().getAnnotation(DateColumn.class);
+        DateColumn dateColumn = columnMetadata.getField().getAnnotation(DateColumn.class);
         if (dateColumn == null) {
             return this;
         }
@@ -407,6 +410,7 @@ public class OrmEntityExtractor implements EntityExtractor {
                         .runtimeException();
             }
         }
+        columnMetadata.setNullable(dateColumn.nullable());
         columnMetadata.setLogicMode(dateColumn.logicMode());
         columnMetadata.setValueMode(dateColumn.valueMode());
         ErrorContextFactory.instance().activity(null);
@@ -414,8 +418,8 @@ public class OrmEntityExtractor implements EntityExtractor {
     }
 
     public EntityExtractor extractFieldPrimaryKey(ColumnMetadata columnMetadata) {
-        Field field = columnMetadata.getColumnField();
-        PrimaryKey primaryKey = columnMetadata.getColumnField().getAnnotation(PrimaryKey.class);
+        Field field = columnMetadata.getField();
+        PrimaryKey primaryKey = field.getAnnotation(PrimaryKey.class);
         PrimaryKeyStrategy strategy = null;
         if (primaryKey == null) {
             return this;
@@ -477,7 +481,7 @@ public class OrmEntityExtractor implements EntityExtractor {
      * @return 是否处理
      */
     public boolean extractField(ColumnMetadata columnMetadata) {
-        Field field = columnMetadata.getColumnField();
+        Field field = columnMetadata.getField();
         Class entityClass = columnMetadata.getEntityClass();
         NumberColumn numberColumn = field.getAnnotation(NumberColumn.class);
         StringColumn stringColumn = field.getAnnotation(StringColumn.class);

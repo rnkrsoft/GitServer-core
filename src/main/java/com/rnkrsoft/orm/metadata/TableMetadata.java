@@ -1,14 +1,13 @@
 package com.rnkrsoft.orm.metadata;
 
 import com.rnkrsoft.orm.annotation.DatabaseType;
+import com.rnkrsoft.reflector.Reflector;
 import com.rnkrsoft.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -151,23 +150,8 @@ public class TableMetadata<T> {
 
     public T newObject() {
         T obj = null;
-        try {
-            Constructor noArgsConstructor = entityClass.getDeclaredConstructor();
-            noArgsConstructor.setAccessible(true);
-            obj = (T) noArgsConstructor.newInstance();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-            //fixme
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            //fixme
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-            //fixme
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            //fixme
-        }
+        Reflector reflector = Reflector.reflector(entityClass);
+        obj = reflector.newInstance();
         return obj;
     }
 

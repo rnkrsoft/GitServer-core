@@ -1,5 +1,8 @@
 package com.rnkrsoft.gitserver.http;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.rnkrsoft.gitserver.http.action.ActionService;
 import com.rnkrsoft.gitserver.http.loader.FileLoader;
 import com.rnkrsoft.log.Logger;
 import com.rnkrsoft.log.LoggerFactory;
@@ -29,6 +32,7 @@ public class HttpServer extends NanoHTTPD {
     final static String HTML_MIME_TYPE = "text/html";
 
     Logger logger = LoggerFactory.getInstance();
+
     //根目录
     private static final String REQUEST_ROOT = "/";
     FileLoader fileLoader;
@@ -74,13 +78,8 @@ public class HttpServer extends NanoHTTPD {
     }
 
     public Response ajax(IHTTPSession session) {
-        try {
-            String str = IOUtils.toString(session.getInputStream(), "UTF-8");
-            System.out.println(str);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return Response.newFixedLengthResponse("ajax success!");
+        ActionService actionService = new ActionService();
+        return actionService.ajax(session);
     }
 
     public Response staticResource(IHTTPSession session, String uri) {

@@ -2,6 +2,10 @@ package com.rnkrsoft.gitserver.service;
 
 import com.rnkrsoft.gitserver.exception.RepositoryCreateFailureException;
 import com.rnkrsoft.gitserver.exception.UninitializedGitServerException;
+import com.rnkrsoft.gitserver.http.AjaxRequest;
+import com.rnkrsoft.gitserver.http.AjaxResponse;
+import com.rnkrsoft.gitserver.service.domain.CreateRepositoryRequest;
+import com.rnkrsoft.gitserver.service.domain.CreateRepositoryResponse;
 import com.rnkrsoft.gitserver.service.domain.QueryRepositoryRequest;
 import com.rnkrsoft.gitserver.service.domain.QueryRepositoryResponse;
 import org.eclipse.jgit.api.Git;
@@ -18,12 +22,19 @@ public interface RepositoryService {
     /**
      * 创建一个git仓库
      *
-     * @param repositoryName 仓库名称
-     * @param owner          拥有者
-     * @throws RepositoryCreateFailureException 创建失败时抛出异常
+     * @param request 请求
+     * @return 应答
+     */
+    AjaxResponse<CreateRepositoryResponse> createRepository(AjaxRequest<CreateRepositoryRequest> request);
+
+    /**
+     * 创建一个git仓库 仓库名称
+     * @param repositoryName
+     * @param owner
+     * @throws RepositoryCreateFailureException
+     * @throws UninitializedGitServerException
      */
     void createRepository(String repositoryName, String owner) throws RepositoryCreateFailureException, UninitializedGitServerException;
-
     /**
      * 打开一个已经存在的git仓库
      *
@@ -62,5 +73,5 @@ public interface RepositoryService {
      *
      * @return 分页结果对象
      */
-    QueryRepositoryResponse queryRepository(QueryRepositoryRequest request);
+    AjaxResponse<QueryRepositoryResponse> queryRepository(AjaxRequest<QueryRepositoryRequest> request);
 }

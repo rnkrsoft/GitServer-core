@@ -7,6 +7,8 @@ import com.rnkrsoft.gitserver.entity.UserEntity;
 import com.rnkrsoft.gitserver.enums.PermissionEnum;
 import com.rnkrsoft.gitserver.exception.RepositoryCreateFailureException;
 import com.rnkrsoft.gitserver.exception.UninitializedGitServerException;
+import com.rnkrsoft.gitserver.http.AjaxRequest;
+import com.rnkrsoft.gitserver.http.AjaxResponse;
 import com.rnkrsoft.gitserver.http.HttpServer;
 import com.rnkrsoft.gitserver.service.PermissionService;
 import com.rnkrsoft.gitserver.service.UserService;
@@ -257,6 +259,11 @@ class GitServerImpl implements GitServer {
 
 
     @Override
+    public AjaxResponse<CreateRepositoryResponse> createRepository(AjaxRequest<CreateRepositoryRequest> request) {
+        return null;
+    }
+
+    @Override
     public void createRepository(String repositoryName, String owner) throws RepositoryCreateFailureException, UninitializedGitServerException {
 
     }
@@ -282,7 +289,7 @@ class GitServerImpl implements GitServer {
     }
 
     @Override
-    public QueryRepositoryResponse queryRepository(QueryRepositoryRequest request) {
+    public AjaxResponse<QueryRepositoryResponse> queryRepository(AjaxRequest<QueryRepositoryRequest> request) {
         return null;
     }
 

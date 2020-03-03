@@ -1,8 +1,8 @@
 package com.rnkrsoft.orm;
 
 import com.rnkrsoft.orm.condition.JdbcCondition;
-import com.rnkrsoft.orm.entity.Pagination;
 import com.rnkrsoft.orm.dao.DataAccessObject;
+import com.rnkrsoft.orm.entity.Pagination;
 import org.junit.Test;
 
 import java.sql.SQLException;
@@ -98,7 +98,7 @@ public class DataAccessObjectTest {
                 .jdbcDriverClassName("org.sqlite.JDBC")
                 .jdbcUrl("jdbc:sqlite:sample.db")
                 .build());
-        DataAccessObject<DemoEntity> dao =Orm.session().dao(DemoEntity.class);
+        DataAccessObject<DemoEntity> dao = Orm.session().dao(DemoEntity.class);
         int cnt = dao.updateByPrimaryKey(DemoEntity.builder().name("1234").age(123456).build());
         System.out.println(cnt);
     }
@@ -134,9 +134,9 @@ public class DataAccessObjectTest {
                 .jdbcDriverClassName("org.sqlite.JDBC")
                 .jdbcUrl("jdbc:sqlite:sample.db")
                 .build());
-        DataAccessObject<DemoEntity> dao =Orm.session().dao(DemoEntity.class);
+        DataAccessObject<DemoEntity> dao = Orm.session().dao(DemoEntity.class);
         List<DemoEntity> list = dao.selectSelective(DemoEntity.builder().sex(1).name("%1%").build(), JdbcCondition.builder().andLike("name").andEq("sex").build());
-        for (DemoEntity demoEntity : list){
+        for (DemoEntity demoEntity : list) {
             System.out.println(demoEntity);
         }
         System.out.println(list.size());

@@ -2,8 +2,7 @@ package com.rnkrsoft.gitserver.http;
 
 import java.io.Serializable;
 
-public class
-AjaxRequest<T> implements Serializable {
+public class AjaxRequest<T> implements Serializable {
     String action;
     T data;
 

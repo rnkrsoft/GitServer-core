@@ -216,7 +216,9 @@ public class DataAccessObject<T> {
             throw new RuntimeException("deleteByPrimaryKey happens error!", e);
         }
     }
-
+    public int countSelective(T entity) {
+        return countSelective(entity, null);
+    }
     /**
      * 统计一个满足实体中非null字段的值记录条数
      *
@@ -237,7 +239,9 @@ public class DataAccessObject<T> {
             throw new RuntimeException("countSelective happens error!", e);
         }
     }
-
+    public List<T> selectSelective(T entity) {
+        return selectSelective(entity, null);
+    }
     /**
      * 查询一个满足实体中非null字段的值的所有记录
      *
@@ -276,7 +280,9 @@ public class DataAccessObject<T> {
             throw new RuntimeException("selectByPrimaryKey happens error!", e);
         }
     }
-
+    public Pagination<T> querySelective(Pagination<T> pagination) {
+        return querySelective(pagination, null);
+    }
     /**
      * 根据分页对象进行分页查询满足条件非null字段的记录，并统计总条数
      *

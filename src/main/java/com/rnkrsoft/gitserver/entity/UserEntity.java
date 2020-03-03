@@ -3,10 +3,12 @@ package com.rnkrsoft.gitserver.entity;
 import com.rnkrsoft.orm.entity.BaseEntity;
 import com.rnkrsoft.orm.annotation.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Comment("用户信息表")

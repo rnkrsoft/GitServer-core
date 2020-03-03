@@ -13,10 +13,13 @@ public class QueryUsersResponse {
     int total;
     int pageNo;
     final List<Record> records = new ArrayList<Record>();
-
+    public QueryUsersResponse addRecord(Record record){
+        records.add(record);
+        return this;
+    }
     @Getter
     @AllArgsConstructor
-    static class Record {
+    public static class Record {
         String username;
         String email;
         String valid;
