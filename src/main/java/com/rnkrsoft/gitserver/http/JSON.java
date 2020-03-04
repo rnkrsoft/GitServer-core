@@ -13,6 +13,53 @@ import java.util.Map;
  * 一个简单的解析JSON文本到键值对的工具
  */
 public class JSON {
+    static class Stack{
+        int[] indexes;
+        int pos = -1;
+
+        public Stack(int size) {
+            this.indexes = new int[size];
+        }
+
+        /**
+         * 压入数据
+         * @param index
+         * @return
+         */
+        public Stack push(int index){
+            if (pos + 1 > indexes.length){
+                throw new IllegalArgumentException("stack overflow!");
+            }
+            indexes[++pos] = index;
+            return this;
+        }
+        public boolean isEmpty(){
+            return pos == -1;
+        }
+        /**
+         * 取栈顶数据
+         * @return
+         */
+        public int peek(){
+            if (pos == -1){
+                return -1;
+            }
+            return indexes[pos];
+        }
+
+        /**
+         * 弹出数据
+         * @return
+         */
+        public int pop(){
+            int r;
+            r = peek();
+            if (r > -1){
+                pos--;
+            }
+            return r;
+        }
+    }
     /**
      * 将传入的URL解析为Map
      *
@@ -53,94 +100,147 @@ public class JSON {
         final Map<String, String> map = new HashMap<String, String>();
         int length = chars.length;//JSON字符串长度
         int topBeginObjectIdx = -1;//JSON对象最外层{开始开始坐标
-        boolean matchedKey = false;//是否匹配了键
-        boolean firstMatchedValue = false;//是否匹配了值
+        boolean matchedKey = false;//是否匹配键完成
+        boolean matchedQuotation = false;//是否匹配了引号
+        boolean matchedValue = false;//是否匹配值完成
         boolean firstMatchedChar = false;//当前是否为第一个匹配的字符
         boolean matchedColon = false;//是否匹配了冒号
         boolean matchedEscape = false;//是否已匹配转义字符
-        boolean gameOver = false;//结束
+        boolean matchedBeginObject = false;
+        Stack stack = new Stack(10);
+        boolean over = false;
         for (int i = 0; i < length; i++) {
             char c = chars[i];
-            //如果前一个是转义字符，则将当前字符放入键或者值中
-            if (matchedEscape) {
-                if (c == '\\' || c == '{' || c == '}' || c == ',' || c == '\''  || c == ':'|| c >= '0' || c <= '9' || c == '-' || c == '.') {
-                    if (matchedKey){
-                        key[keyLength++] = c;
-                    }else{
-                        value[valueLength++] = c;
-                    }
-                }else{
-                    if (matchedKey){
-                        key[keyLength++] = '\\';
-                        key[keyLength++] = c;
-                    }else{
-                        value[valueLength++]  = '\\';
-                        value[valueLength++] = c;
-                    }
-                }
-                continue;//已处理当前字符
-            }
-
-            if (c == '{') {
-                if (topBeginObjectIdx == -1) {//如果顶层的开始符号{还没有
-                    topBeginObjectIdx = i;
+            if (over) {
+                if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
                     continue;//已处理当前字符
+                } else {
+                    throw new IllegalArgumentException("illegal json");
                 }
-            } else if (c == '}') {
-                gameOver = true;
+            }
+            if (matchedValue) {
+                //如果不在引号包裹里的逗号，是语法符号
                 map.put(new String(Arrays.copyOf(key, keyLength)).trim(), new String(Arrays.copyOf(value, valueLength)).trim());
                 keyLength = 0;
                 valueLength = 0;
                 matchedKey = false;
+                matchedValue = false;
                 matchedColon = false;
-                firstMatchedValue = false;
-                break;//已处理当前字符
+                firstMatchedChar = false;
+            }
+            //如果前一个是转义字符，则将当前字符放入键或者值中
+            if (matchedEscape) {
+                if (c == '\\' || c == '{' || c == '}' || c == ',' || c == '\'' || c == ':' || c >= '0' || c <= '9' || c == '-' || c == '.') {
+                    if (matchedKey) {
+                        key[keyLength++] = c;
+                    } else {
+                        value[valueLength++] = c;
+                    }
+                } else {
+                    if (matchedKey) {
+                        key[keyLength++] = '\\';
+                        key[keyLength++] = c;
+                    } else {
+                        value[valueLength++] = '\\';
+                        value[valueLength++] = c;
+                    }
+                }
+                continue;//已处理当前字符
+            }
+
+            if (matchedBeginObject) {
+                if (c != '}') {
+                    value[valueLength++] = c;
+                    continue;//已处理当前字符
+                }
+            }
+            if (c == '{') {
+                if (topBeginObjectIdx == -1) {//如果顶层的开始符号{还没有
+                    topBeginObjectIdx = i;
+                    continue;//已处理当前字符
+                } else if (!matchedBeginObject) {
+                    if (!firstMatchedChar) {
+                        firstMatchedChar = true;
+                    }
+                    value[valueLength++] = c;
+                    matchedBeginObject = true;
+                    stack.push(i);
+                    continue;//已处理当前字符
+                }
+            } else if (c == '}') {
+                if (matchedBeginObject) {
+                    value[valueLength++] = c;
+                    if (!stack.isEmpty()){
+                        stack.pop();
+                    }else{
+                        matchedBeginObject = false;
+                        matchedValue = true;
+                    }
+                    continue;
+                } else {
+                    if (matchedKey && matchedValue && matchedColon) {
+                        map.put(new String(Arrays.copyOf(key, keyLength)).trim(), new String(Arrays.copyOf(value, valueLength)).trim());
+                        over = true;
+                    } else {
+                        if (matchedQuotation) {
+                            throw new IllegalArgumentException("illegal json");
+                        } else {
+                            map.put(new String(Arrays.copyOf(key, keyLength)).trim(), new String(Arrays.copyOf(value, valueLength)).trim());
+                            over = true;
+                        }
+                    }
+                }
             } else if (c == ',') {
-                if (matchedColon && firstMatchedValue) {
-                    //如果不在引号包裹里的逗号，是语法符号
-                    map.put(new String(Arrays.copyOf(key, keyLength)).trim(), new String(Arrays.copyOf(value, valueLength)).trim());
-                    keyLength = 0;
-                    valueLength = 0;
-                    matchedKey = false;
-                    matchedColon = false;
-                    firstMatchedValue = false;
-                }else{
-                    firstMatchedValue = true;
+                if (!matchedKey && !firstMatchedChar) {
+                    firstMatchedChar = true;
+                } else if (!matchedKey && firstMatchedChar) {
+                    matchedKey = true;
+                    firstMatchedChar = false;
+                } else if (matchedKey && !matchedColon && !firstMatchedChar) {
+                    throw new IllegalArgumentException("illegal json");
+                } else if (matchedKey && matchedColon && !firstMatchedChar) {
+                } else if (matchedKey && matchedColon && firstMatchedChar) {
+                    matchedValue = true;
                 }
+                continue;//已处理当前字符
             } else if (c == '\'') {
-                if (matchedColon && firstMatchedValue){
-                    //如果不在引号包裹里的逗号，是语法符号
-                    map.put(new String(Arrays.copyOf(key, keyLength)).trim(), new String(Arrays.copyOf(value, valueLength)).trim());
-                    keyLength = 0;
-                    valueLength = 0;
-                    matchedKey = false;
-                    matchedColon = false;
-                    firstMatchedValue = false;
-                }else{
-                    firstMatchedValue = true;
+                if (!firstMatchedChar) {
+                    matchedQuotation = true;
+                } else if (matchedQuotation) {
+                    matchedQuotation = false;
                 }
+                continue;//已处理当前字符
             } else if (c == ':') {
+                matchedKey = true;
+                firstMatchedChar = false;
                 matchedColon = true;
                 continue;//已处理当前字符
             } else if (c >= '0' || c <= '9' || c == '-' || c == '.') {
-                if (matchedColon){
+                if (matchedColon) {
                     value[valueLength++] = c;
-                }else{
+                } else {
                     key[keyLength++] = c;
                 }
-            }else if (c == '\\'){
-                if (matchedEscape){//当前字符是\ 并且重置matchedEscape
-                    if (matchedColon){
+                if (!firstMatchedChar) {
+                    firstMatchedChar = true;
+                }
+            } else if (c == '\\') {
+                if (matchedEscape) {//当前字符是\ 并且重置matchedEscape
+                    if (matchedColon) {
                         value[valueLength++] = c;
-                    }else{
+                    } else {
                         key[keyLength++] = c;
                     }
                     matchedEscape = false;
-                }else{//当前字符是转义字符
+                    if (!firstMatchedChar) {
+                        firstMatchedChar = true;
+                    }
+                } else {//当前字符是转义字符
                     matchedEscape = true;
                 }
+            } else if (c == ' ' || c == '\t' || c == '\n' || c == '\r') {
+                continue;//已处理当前字符
             }
-
         }
         return map;
     }
