@@ -1,9 +1,8 @@
 package com.rnkrsoft.gitserver.service.domain;
 
-import com.rnkrsoft.gitserver.http.AjaxResponse;
+import lombok.Data;
 
-public class CreateRepositoryResponse extends AjaxResponse {
-    public CreateRepositoryResponse(Result result, Object data) {
-        super(result, data);
-    }
+@Data
+public class CreateRepositoryResponse{
+    int repositoryId;
 }

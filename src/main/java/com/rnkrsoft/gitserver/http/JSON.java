@@ -52,9 +52,12 @@ public class JSON {
          * @return
          */
         public int pop(){
-            int r;
-            r = peek();
+            if (pos == -1){
+                return -1;
+            }
+            int r = indexes[pos];
             if (r > -1){
+                indexes[pos] = 0;
                 pos--;
             }
             return r;
@@ -106,8 +109,7 @@ public class JSON {
         boolean firstMatchedChar = false;//当前是否为第一个匹配的字符
         boolean matchedColon = false;//是否匹配了冒号
         boolean matchedEscape = false;//是否已匹配转义字符
-        boolean matchedBeginObject = false;
-        Stack stack = new Stack(10);
+        Stack matchedBeginObjectStack = new Stack(100);
         boolean over = false;
         for (int i = 0; i < length; i++) {
             char c = chars[i];
@@ -148,35 +150,37 @@ public class JSON {
                 continue;//已处理当前字符
             }
 
-            if (matchedBeginObject) {
-                if (c != '}') {
+            if (!matchedBeginObjectStack.isEmpty()) {
+                if (c == '}'){
                     value[valueLength++] = c;
-                    continue;//已处理当前字符
+                    matchedBeginObjectStack.pop();
+                    //弹出后，栈为空，说明当前对象结束
+                    if (matchedBeginObjectStack.isEmpty()) {
+                        matchedValue = true;
+                    }
+                }else if (c == '{'){
+                    value[valueLength++] = c;
+                    matchedBeginObjectStack.push(i);
+                }else{
+                    value[valueLength++] = c;
                 }
+                continue;//已处理当前字符
             }
             if (c == '{') {
                 if (topBeginObjectIdx == -1) {//如果顶层的开始符号{还没有
                     topBeginObjectIdx = i;
                     continue;//已处理当前字符
-                } else if (!matchedBeginObject) {
+                } else{//第一次出现{
                     if (!firstMatchedChar) {
                         firstMatchedChar = true;
                     }
                     value[valueLength++] = c;
-                    matchedBeginObject = true;
-                    stack.push(i);
+                    matchedBeginObjectStack.push(i);//将{当前位置存放到栈中
                     continue;//已处理当前字符
                 }
-            } else if (c == '}') {
-                if (matchedBeginObject) {
-                    value[valueLength++] = c;
-                    if (!stack.isEmpty()){
-                        stack.pop();
-                    }else{
-                        matchedBeginObject = false;
-                        matchedValue = true;
-                    }
-                    continue;
+            } else if (c == '}') {//顶层对象结束
+                if (!matchedBeginObjectStack.isEmpty()) {//如果开JSON对象开始符号栈中有则为对象中，并非最顶层结束
+                    throw new IllegalArgumentException("illegal json");
                 } else {
                     if (matchedKey && matchedValue && matchedColon) {
                         map.put(new String(Arrays.copyOf(key, keyLength)).trim(), new String(Arrays.copyOf(value, valueLength)).trim());

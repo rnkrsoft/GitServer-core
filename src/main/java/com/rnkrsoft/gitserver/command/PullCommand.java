@@ -19,12 +19,12 @@ public final class PullCommand extends AbstractGitCommand {
 
     @Override
     protected void run() throws IOException {
-        if (!gitServer.hasPermission(name, session.getUsername(), "pull")) {
-            err.write(MSG_REPOSITORY_PERMISSIONS.getBytes());
-            err.flush();
-            onExit(CommandConstants.CODE_ERROR, MSG_REPOSITORY_PERMISSIONS);
-            return;
-        }
+//        if (!gitPermissionService.hasPermission(name, session.getUsername(), "pull")) {
+//            err.write(MSG_REPOSITORY_PERMISSIONS.getBytes());
+//            err.flush();
+//            onExit(CommandConstants.CODE_ERROR, MSG_REPOSITORY_PERMISSIONS);
+//            return;
+//        }
 
         Config config = new Config();
         int timeout = 30;

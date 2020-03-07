@@ -43,9 +43,13 @@ public class JSONTest {
         Map<String, String> map = JSON.parse("{action:'doa', data:{name:{age:123}} } ");
         Assert.assertEquals("doa", map.get("action"));
         Assert.assertEquals("{name:{age:123}}", map.get("data"));
+    }
 
-        Map<String, String> map1 = JSON.parse("{action:'doa', data:{name:{age:{xxxx:111}, yyyy:'1111', zzz:{xxx:zzzz}}}} } ");
+
+    @Test
+    public void parse4() {
+        Map<String, String> map1 = JSON.parse("{action:'doa', data:{name:{age:{xxxx:111}, yyyy:'1111', zzz:{xxx:zzzz}},    \t\t\t\n\r zzz:{xxx:zzzz}} } ");
         Assert.assertEquals("doa", map1.get("action"));
-        Assert.assertEquals("{name:{age:{xxxx:111}, yyyy:'1111', zzz:{xxx:zzzz}}}}", map1.get("data"));
+        Assert.assertEquals("{name:{age:{xxxx:111}, yyyy:'1111', zzz:{xxx:zzzz}},    \t\t\t\n\r zzz:{xxx:zzzz}}", map1.get("data"));
     }
 }

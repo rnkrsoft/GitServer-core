@@ -1,7 +1,7 @@
 package com.rnkrsoft.gitserver.entity;
 
-import com.rnkrsoft.orm.entity.BaseEntity;
-import com.rnkrsoft.orm.annotation.*;
+import com.rnkrsoft.litebatis.annotation.*;
+import com.rnkrsoft.litebatis.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +14,11 @@ import lombok.NoArgsConstructor;
 @Comment("仓库信息表")
 @Table(name = "tb_repository_info")
 public class RepositoryEntity extends BaseEntity {
-    @PrimaryKey(strategy = PrimaryKeyStrategy.NONE)
+    @PrimaryKey(strategy = PrimaryKeyStrategy.IDENTITY)
+    @NumberColumn(name = "repository_id", nullable = false)
+    @Comment("仓库编号")
+    Integer repositoryId;
+
     @StringColumn(name = "repository_name", nullable = false)
     @Comment("仓库名称，显示为英文")
     String repositoryName;

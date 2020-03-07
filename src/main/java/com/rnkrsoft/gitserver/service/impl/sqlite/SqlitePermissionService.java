@@ -1,6 +1,7 @@
 package com.rnkrsoft.gitserver.service.impl.sqlite;
 
-import com.rnkrsoft.gitserver.enums.PermissionEnum;
+import com.rnkrsoft.gitserver.http.AjaxRequest;
+import com.rnkrsoft.gitserver.http.AjaxResponse;
 import com.rnkrsoft.gitserver.service.PermissionService;
 import com.rnkrsoft.gitserver.service.domain.GetOwnPermissionUserDetailRequest;
 import com.rnkrsoft.gitserver.service.domain.GetOwnPermissionUserDetailResponse;
@@ -10,27 +11,12 @@ import com.rnkrsoft.gitserver.service.domain.ListRepositoryPermissionUserRespons
 public class SqlitePermissionService implements PermissionService {
 
     @Override
-    public boolean hasPermission(String repositoryName, String username, String operate) {
-        return false;
-    }
-
-    @Override
-    public void grantPermission(String repositoryName, String username, PermissionEnum... operates) {
-
-    }
-
-    @Override
-    public void revokePermission(String permissionId) {
-
-    }
-
-    @Override
-    public ListRepositoryPermissionUserResponse listRepositoryPermissionUser(ListRepositoryPermissionUserRequest request) {
+    public AjaxResponse<ListRepositoryPermissionUserResponse> listRepositoryPermissionUser(AjaxRequest<ListRepositoryPermissionUserRequest> ajaxRequest) {
         return null;
     }
 
     @Override
-    public GetOwnPermissionUserDetailResponse getOwnPermissionUserDetail(GetOwnPermissionUserDetailRequest request) {
+    public AjaxResponse<GetOwnPermissionUserDetailResponse> getOwnPermissionUserDetail(AjaxRequest<GetOwnPermissionUserDetailRequest> ajaxRequest) {
         return null;
     }
 }

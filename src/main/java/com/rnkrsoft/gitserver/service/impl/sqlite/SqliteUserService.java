@@ -1,81 +1,80 @@
 package com.rnkrsoft.gitserver.service.impl.sqlite;
 
 import com.rnkrsoft.gitserver.entity.UserEntity;
+import com.rnkrsoft.gitserver.http.AjaxRequest;
+import com.rnkrsoft.gitserver.http.AjaxResponse;
 import com.rnkrsoft.gitserver.service.UserService;
-import com.rnkrsoft.gitserver.service.domain.QueryUsersRequest;
-import com.rnkrsoft.gitserver.service.domain.QueryUsersResponse;
-import com.rnkrsoft.gitserver.service.domain.UpdateUserRequest;
-import com.rnkrsoft.orm.Orm;
-import com.rnkrsoft.orm.condition.JdbcCondition;
-import com.rnkrsoft.orm.dao.DataAccessObject;
-import com.rnkrsoft.orm.entity.Pagination;
-import com.rnkrsoft.orm.session.Session;
+import com.rnkrsoft.gitserver.service.domain.*;
+import com.rnkrsoft.litebatis.LiteBatis;
+import com.rnkrsoft.litebatis.condition.JdbcCondition;
+import com.rnkrsoft.litebatis.context.LiteBatisContext;
+import com.rnkrsoft.litebatis.dao.DataAccessObject;
+import com.rnkrsoft.litebatis.entity.Pagination;
+import com.rnkrsoft.litebatis.session.Session;
 
 import java.util.List;
 
 public class SqliteUserService implements UserService {
 
     @Override
-    public void registerUser(String username, String email, String passwordSha1) {
-        Session session = Orm.session();
-        DataAccessObject<UserEntity> userDao = session.dao(UserEntity.class);
-        userDao.insert(UserEntity.builder().username(username).email(email).password(passwordSha1).valid(true).build());
+    public AjaxResponse<RegisterUserResponse> registerUser(AjaxRequest<RegisterUserRequest> ajaxRequest) {
+        RegisterUserRequest request = ajaxRequest.getData();
+        Session session = LiteBatis.session();
+        DataAccessObject<UserEntity, String> userDao = session.dao(UserEntity.class);
+        userDao.insert(UserEntity.builder().username(request.getUsername()).email(request.getEmail()).password(request.getPasswordSha1()).valid(true).build());
+        RegisterUserResponse response = new RegisterUserResponse();
+        return new AjaxResponse<RegisterUserResponse>(response);
     }
 
     @Override
-    public void updateUser(UpdateUserRequest request) {
-        Session session = Orm.session();
-        DataAccessObject<UserEntity> userDao = session.dao(UserEntity.class);
+    public AjaxResponse<UpdateUserResponse> updateUser(AjaxRequest<UpdateUserRequest> ajaxRequest) {
+        UpdateUserRequest request = ajaxRequest.getData();
+        Session session = LiteBatis.session();
+        DataAccessObject<UserEntity, String> userDao = session.dao(UserEntity.class);
         userDao.updateByPrimaryKeySelective(UserEntity.builder().username(request.getUsername()).email(request.getEmail()).valid(request.getValid()).password(request.getPassword()).build());
+        UpdateUserResponse response = new UpdateUserResponse();
+        return new AjaxResponse<UpdateUserResponse>(response);
     }
 
     @Override
-    public void deleteUser(String username) {
-        Session session = Orm.session();
-        DataAccessObject<UserEntity> userDao = session.dao(UserEntity.class);
-        userDao.deleteByPrimaryKey(UserEntity.builder().username(username).build());
+    public AjaxResponse<DeleteUserResponse> deleteUser(AjaxRequest<DeleteUserRequest> ajaxRequest) {
+        DeleteUserRequest request = ajaxRequest.getData();
+        Session session = LiteBatis.session();
+        DataAccessObject<UserEntity, String> userDao = session.dao(UserEntity.class);
+        userDao.deleteByPrimaryKey(request.getUsername());
+        DeleteUserResponse response = new DeleteUserResponse();
+        return new AjaxResponse<DeleteUserResponse>(response);
     }
 
     @Override
-    public List<UserEntity> listUsers() {
-        Session session = Orm.session();
-        DataAccessObject<UserEntity> userDao = session.dao(UserEntity.class);
-        return userDao.selectSelective(UserEntity.builder().build());
+    public AjaxResponse<ListUsersResponse> listUsers(AjaxRequest<ListUsersRequest> ajaxRequest) {
+        ListUsersRequest request = ajaxRequest.getData();
+        Session session = LiteBatis.session();
+        DataAccessObject<UserEntity, String> userDao = session.dao(UserEntity.class);
+        List<UserEntity> userEntities = userDao.selectSelective(UserEntity.builder().build());
+        ListUsersResponse response = new ListUsersResponse();
+        for (UserEntity userEntity : userEntities){
+            response.getUsers().add(userEntity.getUsername());
+        }
+        return new AjaxResponse<ListUsersResponse>(response);
     }
 
     @Override
-    public QueryUsersResponse queryUsers(QueryUsersRequest request) {
-        Session session = Orm.session();
-        DataAccessObject<UserEntity> userDao = session.dao(UserEntity.class);
+    public AjaxResponse<QueryUsersResponse> queryUsers(AjaxRequest<QueryUsersRequest> ajaxRequest) {
+        QueryUsersRequest request = ajaxRequest.getData();
+        Session session = LiteBatis.session();
+        DataAccessObject<UserEntity,String> userDao = session.dao(UserEntity.class);
         JdbcCondition.JdbcConditionBuilder conditionBuilder = JdbcCondition.builder();
         if (request.isUserNameLike()){
             conditionBuilder.andLike("username");
         }
-        Pagination<UserEntity> pagination = userDao.querySelective(new Pagination<UserEntity>(request.getPageSize(), request.getPageNo(), UserEntity.builder().username(request.getUserName()).build()), conditionBuilder.build());
+        Pagination<UserEntity> pagination = userDao.querySelective(LiteBatisContext.builder().condition(conditionBuilder.build()).build(), new Pagination<UserEntity>(request.getPageSize(), request.getPageNo(), UserEntity.builder().username(request.getUserName()).build()));
         QueryUsersResponse response = new QueryUsersResponse();
         response.setTotal(pagination.getTotal());
         response.setPageNo(pagination.getCurPageNo());
         for (UserEntity userEntity : pagination.getRecords()){
-            response.addRecord(new QueryUsersResponse.Record(userEntity.getUsername(), userEntity.getEmail(), Boolean.toString(userEntity.isValid())));
+            response.addRecord(new QueryUsersResponse.Record(userEntity.getUsername(), userEntity.getEmail(), Boolean.toString(userEntity.getValid())));
         }
-        return response;
-    }
-
-    @Override
-    public boolean hasUser(String username) {
-        Session session = Orm.session();
-        DataAccessObject<UserEntity> userDao = session.dao(UserEntity.class);
-        return userDao.countSelective(UserEntity.builder().username(username).build()) > 0;
-    }
-
-    @Override
-    public boolean hasAuthority(String username, String passwordSha1) {
-        Session session = Orm.session();
-        DataAccessObject<UserEntity> userDao = session.dao(UserEntity.class);
-        UserEntity userEntity = userDao.selectByPrimaryKey(UserEntity.builder().username(username).build());
-        if (userEntity == null) {
-            return false;
-        }
-        return passwordSha1.equals(userEntity.getPassword());
+        return new AjaxResponse<QueryUsersResponse>(response);
     }
 }

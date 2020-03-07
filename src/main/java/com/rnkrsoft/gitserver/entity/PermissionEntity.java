@@ -1,13 +1,19 @@
 package com.rnkrsoft.gitserver.entity;
 
-import com.rnkrsoft.gitserver.enums.PermissionEnum;
-import com.rnkrsoft.orm.entity.BaseEntity;
-import com.rnkrsoft.orm.annotation.*;
+import com.rnkrsoft.gitserver.enums.PermissionTypeEnum;
+import com.rnkrsoft.litebatis.annotation.*;
+import com.rnkrsoft.litebatis.entity.BaseEntity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
-@Comment("仓库信息表")
-@Table(name = "tb_repository_info")
+@Comment("权限信息表")
+@Table(name = "tb_permission_info")
 public class PermissionEntity extends BaseEntity {
     @PrimaryKey(strategy = PrimaryKeyStrategy.IDENTITY)
     @NumberColumn(name = "permission_id", nullable = false)
@@ -22,7 +28,7 @@ public class PermissionEntity extends BaseEntity {
     @Comment("用户名")
     String username;
 
-    @NumberColumn(name = "operate", nullable = false, enumClass = PermissionEnum.class)
+    @NumberColumn(name = "PERMISSION_TYPE", nullable = false, enumClass = PermissionTypeEnum.class)
     @Comment("操作代码")
-    Integer operate;
+    Integer permissionType;
 }

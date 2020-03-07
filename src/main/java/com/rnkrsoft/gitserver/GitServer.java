@@ -1,16 +1,12 @@
 package com.rnkrsoft.gitserver;
 
 import com.rnkrsoft.gitserver.exception.UninitializedGitServerException;
-import com.rnkrsoft.gitserver.service.PermissionService;
-import com.rnkrsoft.gitserver.service.RepositoryService;
-import com.rnkrsoft.gitserver.service.RoleService;
-import com.rnkrsoft.gitserver.service.UserService;
 
 /**
  * Git服务
  * Created by woate on 2020/02/24.
  */
-public interface GitServer extends UserService, PermissionService, RoleService, RepositoryService {
+public interface GitServer {
     int STOP = 0;
     int INIT = 1;
     int RUNNING = 2;

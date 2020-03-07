@@ -3,6 +3,12 @@ package com.rnkrsoft.gitserver.command;
 import com.rnkrsoft.gitserver.GitServer;
 import com.rnkrsoft.gitserver.exception.RepositoryCreateFailureException;
 import com.rnkrsoft.gitserver.exception.UninitializedGitServerException;
+import com.rnkrsoft.gitserver.internal.GitPermissionService;
+import com.rnkrsoft.gitserver.internal.GitRepositoryService;
+import com.rnkrsoft.gitserver.internal.GitUserService;
+import com.rnkrsoft.gitserver.internal.impl.GitPermissionServiceImpl;
+import com.rnkrsoft.gitserver.internal.impl.GitRepositoryServiceImpl;
+import com.rnkrsoft.gitserver.internal.impl.GitUserServiceImpl;
 import com.rnkrsoft.log.Logger;
 import com.rnkrsoft.log.LoggerFactory;
 import org.apache.sshd.server.Environment;
@@ -21,12 +27,18 @@ public abstract class AbstractGitCommand extends BaseCommand {
     private final static String MSG_REPOSITORY_ACCESS_PROBLEM = "Problem accessing the repository.\r\n";
     protected String name;
     protected GitServer gitServer;
+    protected GitRepositoryService gitRepositoryService;
+    protected GitPermissionService gitPermissionService;
+    protected GitUserService gitUserService;
 
     protected Repository repo;
 
     public AbstractGitCommand(String name, GitServer gitServer) {
         this.name = name;
         this.gitServer = gitServer;
+        this.gitRepositoryService = new GitRepositoryServiceImpl(gitServer);
+        this.gitPermissionService = new GitPermissionServiceImpl(gitServer);
+        this.gitUserService = new GitUserServiceImpl(gitServer);
     }
 
     public void start(final Environment env) {
@@ -40,11 +52,11 @@ public abstract class AbstractGitCommand extends BaseCommand {
     private void service(final Environment env) {
         try {
             logger.info("Git Server Repositories Home is '" + gitServer.getRepositoriesHome() + "'");
-            repo = gitServer.openRepository(getRepositoryMapping()).getRepository();
+            repo = this.gitRepositoryService.openRepository(getRepositoryMapping()).getRepository();
         } catch (RepositoryNotFoundException e1) {
             try {
-                gitServer.createRepository(getRepositoryMapping(), "");
-                repo = gitServer.openRepository(getRepositoryMapping()).getRepository();
+                this.gitRepositoryService.createRepository(getRepositoryMapping(), "");
+                repo = this.gitRepositoryService.openRepository(getRepositoryMapping()).getRepository();
             } catch (RepositoryCreateFailureException e) {
                 logger.error("Repository not found.", e1);
                 onExit(CommandConstants.CODE_ERROR, MSG_REPOSITORY_NOT_FOUND);

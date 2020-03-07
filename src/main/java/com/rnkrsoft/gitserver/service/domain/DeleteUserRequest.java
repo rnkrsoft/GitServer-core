@@ -5,12 +5,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Created by test on 2020/3/5.
+ */
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class CreateRepositoryRequest {
-    String repositoryName;
-    String repositoryDesc;
-    String owner;
+public class DeleteUserRequest {
+    String username;
 }

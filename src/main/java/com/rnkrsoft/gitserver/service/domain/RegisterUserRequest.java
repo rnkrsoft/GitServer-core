@@ -5,25 +5,24 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Builder
+/**
+ * Created by test on 2020/3/5.
+ */
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-public class UpdateUserRequest {
+@Builder
+public class RegisterUserRequest {
     /**
-     * username 用户名
+     * 用户名
      */
     String username;
     /**
-     * email 邮箱地址
+     * 邮箱地址
      */
     String email;
     /**
-     * password 用户输入的密码
+     * sha1算法处理过的密码
      */
-    String password;
-    /**
-     * valid 是否有效 如果为null，则不更新是否有效
-     */
-    Boolean valid;
+    String passwordSha1;
 }

@@ -6,6 +6,11 @@ public class AjaxRequest<T> implements Serializable {
     String action;
     T data;
 
+    public AjaxRequest(String action, T data) {
+        this.action = action;
+        this.data = data;
+    }
+
     public void setAction(String action) {
         this.action = action;
     }

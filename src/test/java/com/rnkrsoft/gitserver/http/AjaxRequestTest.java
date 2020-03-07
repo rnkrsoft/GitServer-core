@@ -8,7 +8,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class AjaxRequestTest {
-    static class DemoBean1{
+    static class DemoBean1 {
         String name;
         int age;
 
@@ -25,22 +25,22 @@ public class AjaxRequestTest {
                     '}';
         }
     }
-    static class DemoBean2{
+
+    static class DemoBean2 {
         String name;
 
         public DemoBean2(String name) {
             this.name = name;
         }
     }
+
     @Test
     public void getData() {
-        AjaxRequest request = new AjaxRequest();
-       Gson gson = new GsonBuilder().create();
-        request.setData(gson.toJson(new DemoBean1("123", 21)));
-        request.setAction("register_user_action");
-       String json = gson.toJson(request);
+        Gson gson = new GsonBuilder().create();
+        AjaxRequest request = new AjaxRequest("register_user_action", gson.toJson(new DemoBean1("123", 21)));
+        String json = gson.toJson(request);
 
-        AjaxRequest request1 = new GsonBuilder().create().fromJson(json,AjaxRequest.class);
+        AjaxRequest request1 = new GsonBuilder().create().fromJson(json, AjaxRequest.class);
 
         System.out.println(request1.getData());
     }

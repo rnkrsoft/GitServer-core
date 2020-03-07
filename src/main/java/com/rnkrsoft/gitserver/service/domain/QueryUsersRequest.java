@@ -1,10 +1,11 @@
 package com.rnkrsoft.gitserver.service.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
 public class QueryUsersRequest {
     String userName;
     boolean userNameLike;

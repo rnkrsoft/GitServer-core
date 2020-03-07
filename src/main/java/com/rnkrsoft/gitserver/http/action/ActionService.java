@@ -2,14 +2,24 @@ package com.rnkrsoft.gitserver.http.action;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.rnkrsoft.gitserver.GitServer;
+import com.rnkrsoft.gitserver.GitServerFactory;
 import com.rnkrsoft.gitserver.http.AjaxRequest;
 import com.rnkrsoft.gitserver.http.AjaxResponse;
+import com.rnkrsoft.gitserver.http.JSON;
 import com.rnkrsoft.gitserver.http.NanoHTTPD;
+import com.rnkrsoft.gitserver.service.UserService;
+import com.rnkrsoft.gitserver.service.domain.QueryUsersRequest;
+import com.rnkrsoft.gitserver.service.domain.QueryUsersResponse;
+import com.rnkrsoft.gitserver.service.impl.sqlite.SqliteUserService;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ActionService {
+    static Gson GSON = new GsonBuilder().create();
     /**
      * 查询项目列表，支持分页查询
      */
@@ -50,17 +60,28 @@ public class ActionService {
      * 收回给用户的权限
      */
     public static final String REVOKE_USER_ACTION = "REVOKE_USER_ACTION";
-    Gson gson = new GsonBuilder().create();
-    public AjaxResponse preform(AjaxRequest request) {
-        return AjaxResponse.SUCCESS;
-    }
+
 
     public NanoHTTPD.Response ajax(NanoHTTPD.IHTTPSession session) {
+        Map<String, String> files = new HashMap<String, String>();
         try {
-            String body = IOUtils.toString(session.getInputStream(), "UTF-8");
-
+            session.parseBody(files);
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (NanoHTTPD.ResponseException e) {
+            e.printStackTrace();
+        }
+        String body = files.get("postData");
+        Map<String, String> map = JSON.parse(body);
+        String action = map.get("action");
+        String data = map.get("data");
+
+        if (action.equals(QUERY_USERS_ACTION)) {
+            QueryUsersRequest request = GSON.fromJson(data, QueryUsersRequest.class);
+            AjaxRequest<QueryUsersRequest> ajaxRequest = new AjaxRequest<QueryUsersRequest>(action, request);
+            UserService userService = new SqliteUserService();
+            AjaxResponse<QueryUsersResponse> ajaxResponse = userService.queryUsers(ajaxRequest);
+            return NanoHTTPD.Response.newFixedLengthResponse(ajaxResponse.toString());
         }
         return NanoHTTPD.Response.newFixedLengthResponse("login success!");
     }

@@ -26,6 +26,7 @@ public class LoggerFactory {
 
     static boolean isAndroid() {
         String processorArchitecture = System.getenv("processor_architecture");
-        return !"AMD64".equals(processorArchitecture);
+        System.out.println(processorArchitecture);
+        return !"AMD64".equals(processorArchitecture) && !"x86".equals(processorArchitecture);
     }
 }

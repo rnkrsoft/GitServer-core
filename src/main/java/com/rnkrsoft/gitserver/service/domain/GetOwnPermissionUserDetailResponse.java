@@ -1,6 +1,6 @@
 package com.rnkrsoft.gitserver.service.domain;
 
-import com.rnkrsoft.gitserver.enums.PermissionEnum;
+import com.rnkrsoft.gitserver.enums.PermissionTypeEnum;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -26,13 +26,13 @@ public class GetOwnPermissionUserDetailResponse {
 
     @Data
     static class NoneRepositoryPermissionRecord {
-        final List<PermissionEnum> operates = new ArrayList<PermissionEnum>();
+        final List<PermissionTypeEnum> operates = new ArrayList<PermissionTypeEnum>();
     }
 
     @Data
     static class RepositoryPermissionRecord {
         String repositoryName;
         String username;
-        final List<PermissionEnum> operates = new ArrayList<PermissionEnum>();
+        final List<PermissionTypeEnum> operates = new ArrayList<PermissionTypeEnum>();
     }
 }

@@ -2,20 +2,20 @@ package com.rnkrsoft.gitserver;
 
 import com.rnkrsoft.gitserver.command.GitCommandFactory;
 import com.rnkrsoft.gitserver.command.SendMessageCommand;
-import com.rnkrsoft.gitserver.entity.RoleEntity;
+import com.rnkrsoft.gitserver.entity.PermissionEntity;
+import com.rnkrsoft.gitserver.entity.RepositoryEntity;
 import com.rnkrsoft.gitserver.entity.UserEntity;
-import com.rnkrsoft.gitserver.enums.PermissionEnum;
-import com.rnkrsoft.gitserver.exception.RepositoryCreateFailureException;
 import com.rnkrsoft.gitserver.exception.UninitializedGitServerException;
-import com.rnkrsoft.gitserver.http.AjaxRequest;
-import com.rnkrsoft.gitserver.http.AjaxResponse;
 import com.rnkrsoft.gitserver.http.HttpServer;
-import com.rnkrsoft.gitserver.service.PermissionService;
-import com.rnkrsoft.gitserver.service.UserService;
-import com.rnkrsoft.gitserver.service.domain.*;
+import com.rnkrsoft.gitserver.internal.GitRepositoryService;
+import com.rnkrsoft.gitserver.internal.GitUserService;
+import com.rnkrsoft.gitserver.internal.impl.GitRepositoryServiceImpl;
+import com.rnkrsoft.gitserver.internal.impl.GitUserServiceImpl;
+import com.rnkrsoft.litebatis.LiteBatis;
+import com.rnkrsoft.litebatis.LiteBatisSetting;
+import com.rnkrsoft.litebatis.dao.DataAccessObject;
 import com.rnkrsoft.log.Logger;
 import com.rnkrsoft.log.LoggerFactory;
-import com.rnkrsoft.orm.entity.Pagination;
 import com.rnkrsoft.util.PasswordUtils;
 import org.apache.sshd.SshServer;
 import org.apache.sshd.common.Factory;
@@ -24,13 +24,11 @@ import org.apache.sshd.server.PasswordAuthenticator;
 import org.apache.sshd.server.PublickeyAuthenticator;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.session.ServerSession;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.errors.RepositoryNotFoundException;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.PublicKey;
-import java.util.List;
+import java.sql.SQLException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -45,8 +43,9 @@ class GitServerImpl implements GitServer {
     Logger logger = LoggerFactory.getInstance();
     SshServer sshServer;
     HttpServer httpServer;
-    UserService userService;
-    PermissionService permissionService;
+
+    final GitUserService gitUserService = new GitUserServiceImpl(this);
+    final GitRepositoryService gitRepositoryService = new GitRepositoryServiceImpl(this);
 
     GitServerImpl() {
 
@@ -76,6 +75,22 @@ class GitServerImpl implements GitServer {
         }
         this.setting = setting;
         this.state.compareAndSet(STOP, INIT);
+
+        try {
+            LiteBatis.init(LiteBatisSetting.builder()
+                    .entityClass(UserEntity.class, RepositoryEntity.class, PermissionEntity.class)
+                    .jdbcDriverClassName("org.sqlite.JDBC")
+                    .jdbcUrl("jdbc:sqlite:./target/sample.db")
+                    .build());
+            DataAccessObject<UserEntity, String> userDao = LiteBatis.session().dao(UserEntity.class);
+            DataAccessObject<RepositoryEntity, Integer> repositoryDao = LiteBatis.session().dao(RepositoryEntity.class);
+            DataAccessObject<PermissionEntity, Integer> permissionDao = LiteBatis.session().dao(PermissionEntity.class);
+            userDao.createTable();
+            repositoryDao.createTable();
+            permissionDao.createTable();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return this;
     }
 
@@ -107,11 +122,11 @@ class GitServerImpl implements GitServer {
                     if (password == null || "".equals(password.trim())) {
                         return false;
                     }
-                    if (hasUser(username)) {//如果已经注册的用户，则验证是否能通过鉴权
-                        return hasAuthority(username, PasswordUtils.generateSha1(password));
+                    if (gitUserService.hasUser(username)) {//如果已经注册的用户，则验证是否能通过鉴权
+                        return gitUserService.hasAuthority(username, PasswordUtils.generateSha1(password));
                     } else {//如果不存在的用户，则自动注册
-                        registerUser(username, username, PasswordUtils.generateSha1(password));
-                        return true;
+
+                        return false;
                     }
                 }
             });
@@ -166,131 +181,4 @@ class GitServerImpl implements GitServer {
             sshServer.stop();
         }
     }
-
-
-    @Override
-    public void addRole(String roleName, String roleDesc) {
-
-    }
-
-    @Override
-    public void deleteRole(String roleName) {
-
-    }
-
-    @Override
-    public void updateRole(String roleName, String roleDesc, boolean valid) {
-
-    }
-
-    @Override
-    public List<RoleEntity> listRoles() {
-        return null;
-    }
-
-    @Override
-    public Pagination<RoleEntity> queryRoles(String roleName, boolean roleNameLike, int pageSize, int pageNo) {
-        return null;
-    }
-
-
-    @Override
-    public void registerUser(String username, String email, String passwordSha1) {
-        this.userService.registerUser(username, email, passwordSha1);
-    }
-
-    @Override
-    public void updateUser(UpdateUserRequest request) {
-
-    }
-
-
-    @Override
-    public void deleteUser(String username) {
-        this.userService.deleteUser(username);
-    }
-
-    @Override
-    public List<UserEntity> listUsers() {
-        return this.userService.listUsers();
-    }
-
-    @Override
-    public QueryUsersResponse queryUsers(QueryUsersRequest request) {
-        return null;
-    }
-
-
-    @Override
-    public boolean hasUser(String username) {
-        return this.userService.hasUser(username);
-    }
-
-    @Override
-    public boolean hasAuthority(String username, String passwordSha1) {
-        return this.userService.hasAuthority(username, passwordSha1);
-    }
-
-    @Override
-    public boolean hasPermission(String repositoryName, String username, String operate) {
-        return permissionService.hasPermission(repositoryName, username, operate);
-    }
-
-    @Override
-    public void grantPermission(String repositoryName, String username, PermissionEnum... operates) {
-
-    }
-
-    @Override
-    public void revokePermission(String permissionId) {
-
-    }
-
-
-    @Override
-    public ListRepositoryPermissionUserResponse listRepositoryPermissionUser(ListRepositoryPermissionUserRequest request) {
-        return null;
-    }
-
-    @Override
-    public GetOwnPermissionUserDetailResponse getOwnPermissionUserDetail(GetOwnPermissionUserDetailRequest request) {
-        return null;
-    }
-
-
-    @Override
-    public AjaxResponse<CreateRepositoryResponse> createRepository(AjaxRequest<CreateRepositoryRequest> request) {
-        return null;
-    }
-
-    @Override
-    public void createRepository(String repositoryName, String owner) throws RepositoryCreateFailureException, UninitializedGitServerException {
-
-    }
-
-    @Override
-    public Git openRepository(String repositoryName) throws RepositoryNotFoundException, UninitializedGitServerException {
-        return null;
-    }
-
-    @Override
-    public void renameRepository(String oldRepositoryName, String newRepositoryName) throws RepositoryNotFoundException, UninitializedGitServerException {
-
-    }
-
-    @Override
-    public void deleteRepository(String repositoryName) throws RepositoryNotFoundException, UninitializedGitServerException {
-
-    }
-
-    @Override
-    public List<String> listRepositoriesName() {
-        return null;
-    }
-
-    @Override
-    public AjaxResponse<QueryRepositoryResponse> queryRepository(AjaxRequest<QueryRepositoryRequest> request) {
-        return null;
-    }
-
 }

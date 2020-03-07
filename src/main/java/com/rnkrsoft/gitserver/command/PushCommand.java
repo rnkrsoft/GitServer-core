@@ -18,12 +18,12 @@ public final class PushCommand extends AbstractGitCommand {
 
     @Override
     protected void run() throws IOException {
-        if (!gitServer.hasPermission(name, session.getUsername(), "push")) {
-            err.write(MSG_REPOSITORY_PERMISSIONS.getBytes());
-            err.flush();
-            onExit(CommandConstants.CODE_ERROR, MSG_REPOSITORY_PERMISSIONS);
-            return;
-        }
+//        if (!gitPermissionService.hasPermission(name, session.getUsername(), "push")) {
+//            err.write(MSG_REPOSITORY_PERMISSIONS.getBytes());
+//            err.flush();
+//            onExit(CommandConstants.CODE_ERROR, MSG_REPOSITORY_PERMISSIONS);
+//            return;
+//        }
 
         int timeout = 30;
         final ReceivePack rp = new ReceivePack(repo);

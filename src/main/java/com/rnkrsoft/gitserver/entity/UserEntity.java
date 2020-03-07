@@ -1,7 +1,7 @@
 package com.rnkrsoft.gitserver.entity;
 
-import com.rnkrsoft.orm.entity.BaseEntity;
-import com.rnkrsoft.orm.annotation.*;
+import com.rnkrsoft.litebatis.annotation.*;
+import com.rnkrsoft.litebatis.entity.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,5 +29,5 @@ public class UserEntity extends BaseEntity {
 
     @NumberColumn(name = "valid", defaultValue = "1", nullable = false)
     @Comment("是否有效")
-    boolean valid;
+    Boolean valid;
 }

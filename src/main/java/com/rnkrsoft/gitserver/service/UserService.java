@@ -1,11 +1,8 @@
 package com.rnkrsoft.gitserver.service;
 
-import com.rnkrsoft.gitserver.entity.UserEntity;
-import com.rnkrsoft.gitserver.service.domain.QueryUsersRequest;
-import com.rnkrsoft.gitserver.service.domain.QueryUsersResponse;
-import com.rnkrsoft.gitserver.service.domain.UpdateUserRequest;
-
-import java.util.List;
+import com.rnkrsoft.gitserver.http.AjaxRequest;
+import com.rnkrsoft.gitserver.http.AjaxResponse;
+import com.rnkrsoft.gitserver.service.domain.*;
 
 /**
  * 用户服务
@@ -14,56 +11,35 @@ import java.util.List;
 public interface UserService {
     /**
      * 注册用户
-     *
-     * @param username     用户名
-     * @param email        邮箱地址
-     * @param passwordSha1 sha1算法处理过的密码
+     * @param ajaxRequest 请求
      */
-    void registerUser(String username, String email, String passwordSha1);
+    AjaxResponse<RegisterUserResponse> registerUser(AjaxRequest<RegisterUserRequest> ajaxRequest);
 
     /**
      * 修改指定用户名的用户信息
-     *
-     * @param request
+     * @param ajaxRequest 请求
      */
-    void updateUser(UpdateUserRequest request);
+    AjaxResponse<UpdateUserResponse> updateUser(AjaxRequest<UpdateUserRequest> ajaxRequest);
 
     /**
      * 删除指定的用户
-     *
-     * @param username 用户名
+     * @param ajaxRequest 请求
      */
-    void deleteUser(String username);
+    AjaxResponse<DeleteUserResponse> deleteUser(AjaxRequest<DeleteUserRequest> ajaxRequest);
 
     /**
      * 列出所有的用户列表
-     *
+     * @param ajaxRequest 请求
      * @return 用户列表
      */
-    List<UserEntity> listUsers();
+    AjaxResponse<ListUsersResponse> listUsers(AjaxRequest<ListUsersRequest> ajaxRequest);
 
     /**
      * 分页查询用户列表
      *
-     * @param request 请求
+     * @param ajaxRequest 请求
      * @return 应答
      */
-    QueryUsersResponse queryUsers(QueryUsersRequest request);
+    AjaxResponse<QueryUsersResponse> queryUsers(AjaxRequest<QueryUsersRequest> ajaxRequest);
 
-    /**
-     * 是否有这个用户，并非鉴权，而只是检查是否注册
-     *
-     * @param username 用户名
-     * @return 返回真时已注册
-     */
-    boolean hasUser(String username);
-
-    /**
-     * 检查指定用户和sha1处理过的密码是否有效
-     *
-     * @param username     用户名
-     * @param passwordSha1 sha1算法处理过的密码
-     * @return 返回真是注册过的用户
-     */
-    boolean hasAuthority(String username, String passwordSha1);
 }

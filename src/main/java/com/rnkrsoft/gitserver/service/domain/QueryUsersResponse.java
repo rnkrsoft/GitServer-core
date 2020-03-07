@@ -1,14 +1,11 @@
 package com.rnkrsoft.gitserver.service.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 public class QueryUsersResponse {
     int total;
     int pageNo;
@@ -18,6 +15,7 @@ public class QueryUsersResponse {
         return this;
     }
     @Getter
+    @ToString
     @AllArgsConstructor
     public static class Record {
         String username;
